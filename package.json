@@ -1,0 +1,23 @@
+{
+  "name": "hockeyteams",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha --R spec"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://git.iu7.bmstu.ru/iu7-software-design/iu7-software-design-labs-2021/iu7-software-design-labs-2021-perestoroninpavel.git"
+  },
+  "author": "Justarone",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.19.0",
+    "chai": "^4.3.4",
+    "express": "^4.17.1",
+    "mocha": "^8.4.0",
+    "nodemon": "^2.0.7",
+    "pg": "^8.6.0"
+  }
+}
