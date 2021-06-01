@@ -7,9 +7,16 @@ class AbstractUserRepo {
     async getUserId(_login, _password, _conn) {}
     async getUser(_id, _conn) {}
     async addUser(_user, _conn) {}
+    async userExists(_login) {}
 }
 
 exports.PgUsersRepo = class PgUsersRepo extends AbstractUserRepo {
+    async userExists(login) {
+        const query = `SELECT id FROM ${USERS_TABLE} WHERE login = ${login};`;
+        const res = await performQuery(query, conn);
+        return res && res.rows.length > 0 ? true : false;
+    }
+
     async addUser(user, conn) {
         const query = `INSERT INTO ${USERS_TABLE} (login, password, plevel) VALUES \
             ('${user.login}', '${user.password}', '${user.plevel}');`;

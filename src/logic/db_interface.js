@@ -1,5 +1,6 @@
 // notice that every method returns promise
 class AbstractDbFacade {
+    async userExists(_login) {}
     async getUserId(_login, _password) {}
     async getUser(_id) {}
     async addUser(_user) {}

@@ -31,8 +31,6 @@ const playersRepo = new PgPlayersRepo();
 const usersRepo = new PgUsersRepo();
 const teamplayerRepo = new PgPlayerTeamRepo();
 
-console.log("aa", teamsRepo);
-
 const dbFacade = new SqlDbFacade(connParams, playersRepo, usersRepo, teamsRepo, teamplayerRepo);
 
 prepareTestDB()

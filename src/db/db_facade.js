@@ -22,6 +22,10 @@ exports.SqlDbFacade = class SqlDbFacade extends AbstractDbFacade {
         this.teamplayerRepo = teamplayerRepo;
     }
 
+    async userExists(login) {
+        return this.usersRepo.userExists(login, this.conn);
+    }
+
     async getUserId(login, password) {
         return this.usersRepo.getUserId(login, password, this.conn);
     }
