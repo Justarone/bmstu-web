@@ -7,11 +7,11 @@ class AbstractUserRepo {
     async getUserId(_login, _password, _conn) {}
     async getUser(_id, _conn) {}
     async addUser(_user, _conn) {}
-    async userExists(_login) {}
+    async userExists(_login, _conn) {}
 }
 
 exports.PgUsersRepo = class PgUsersRepo extends AbstractUserRepo {
-    async userExists(login) {
+    async userExists(login, conn) {
         const query = `SELECT id FROM ${USERS_TABLE} WHERE login = ${login};`;
         const res = await performQuery(query, conn);
         return res && res.rows.length > 0 ? true : false;
@@ -26,13 +26,17 @@ exports.PgUsersRepo = class PgUsersRepo extends AbstractUserRepo {
     async getUserId(login, password, conn) {
         const query = `SELECT id FROM ${USERS_TABLE} WHERE login = '${login}' AND password = '${password}';`;
         const res = await performQuery(query, conn);
-        return res ? res.rows[0].id : res;
+        return res && res.rows.length > 0 ? res.rows[0].id : null;
     }
 
     async getUser(id, conn) {
         const query = `SELECT * FROM ${USERS_TABLE} WHERE id = ${id};`;
         const res = await performQuery(query, conn);
+        if (!res || !res.rows.length) 
+            return null;
         const teams = await this.buildUserTeams(id, conn);
+        if (!teams)
+            return null;
         const { login, password, plevel } = res.rows[0];
         return new User(id, login, password, teams, plevel);
     }
@@ -43,7 +47,7 @@ exports.PgUsersRepo = class PgUsersRepo extends AbstractUserRepo {
         if (!res) 
             return res;
         const teams = [];
-        for (i in res.rows) {
+        for (const i in res.rows) {
             const team = await this.buildTeam(res.rows[i], conn);
             if (!team) 
                 return null;

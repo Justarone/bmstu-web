@@ -8,7 +8,7 @@ class AbstractTeamsRepo {
 exports.PgTeamsRepo = class PgTeamsRepo extends AbstractTeamsRepo {
     async addTeam(team, conn) {
         const query = `INSERT INTO ${TEAMS_TABLE} (name, owner_id) VALUES \
-            ('${team.name}', '${team.ownerId}');`;
+            ('${team.name}', ${team.ownerId});`;
         return performQuery(query, conn);
     }
 
