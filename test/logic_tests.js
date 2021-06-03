@@ -19,6 +19,15 @@ const prepareTestDB = () => {
     ['prep_test.sql', 'init.sql'].forEach(file => exec(script_template + file));
 }
 
+const errorWrapper = async prom => {
+    try {
+        const res = await prom;
+        return res;
+    } catch(err) {
+        return null;
+    }
+}
+
 const connParams = {
                 user: USERNAME,
                 host: HOST,
@@ -68,13 +77,13 @@ describe("Logic component tests", function() {
         })
 
         it("Negative tests: signin/signup multiple users", async function() {
-            let res = await logicFacade.signUp("a", "b");
+            let res = await errorWrapper(logicFacade.signUp("a", "b"));
             expect(res).to.equal(null);
-            res = await logicFacade.signIn("a", "b");
+            res = await errorWrapper(logicFacade.signIn("a", "b"));
             expect(res).to.equal(null);
-            res = await logicFacade.signIn("asdfasf", "asdffgfs");
+            res = await errorWrapper(logicFacade.signIn("asdfasf", "asdffgfs"));
             expect(res).to.equal(null);
-            res = await logicFacade.signIn("justarone1", "justa1");
+            res = await errorWrapper(logicFacade.signIn("justarone1", "justa1"));
             expect(res).to.equal(null);
         })
     });
@@ -82,11 +91,10 @@ describe("Logic component tests", function() {
     describe("Teams creation", function() {
         it("Create teams for user", async function() {
             for (i in teams) {
-                const id = users[0].id;
+                const id = +users[0].id;
                 teams[i].ownerId = id;
-                const res = await logicFacade.addTeam(teams[i], id);
-                expect(res).to.not.equal(null);
-                teams[i].id = i + 1;
+                await logicFacade.addTeam(teams[i], id);
+                teams[i].id = +i + 1;
             }
             teams = await logicFacade.getAllUserTeams(users[0].id);
             expect(teams.length).to.equal(2);
@@ -94,8 +102,7 @@ describe("Logic component tests", function() {
 
         it("Delete teams", async function() {
             for (i in teams) {
-                const res = await logicFacade.delTeam(teams[i].id, users[0].id);
-                expect(res).to.not.equal(null);
+                await logicFacade.delTeam(teams[i].id, users[0].id);
                 const fetchedTeams = await logicFacade.getAllUserTeams(users[0].id);
                 expect(fetchedTeams.length).to.equal(2 - i - 1);
             }
@@ -103,13 +110,13 @@ describe("Logic component tests", function() {
 
         it("Delete other user's team", async function() {
             for (i in teams) {
-                const id = users[0].id;
+                const id = +users[0].id;
                 teams[i].ownerId = id;
                 const res = await logicFacade.addTeam(teams[i], id);
                 expect(res).to.not.equal(null);
-                teams[i].id = i + 1;
+                teams[i].id = +i + 1;
             }
-            const res = await logicFacade.delTeam(teams[i].id, users[1].id);
+            const res = await errorWrapper(logicFacade.delTeam(teams[i].id, users[1].id));
             expect(res).to.equal(null);
             const fetchedTeams = await logicFacade.getAllUserTeams(users[0].id);
             teams = fetchedTeams;
@@ -118,6 +125,7 @@ describe("Logic component tests", function() {
 
     describe("Players creation", function() {
         it("Admin user creates players", async function() {
+            console.log(users);
             for (i in players) {
                 const res = await logicFacade.addPlayer(players[i], users[2].id);
                 expect(res).to.not.equal(null);
@@ -129,7 +137,7 @@ describe("Logic component tests", function() {
 
         it("Simple users create players", async function() {
             for (i in players) {
-                const res = await logicFacade.addPlayer(players[i], users[i % 2].id);
+                const res = await errorWrapper(logicFacade.addPlayer(players[i], users[i % 2].id));
                 expect(res).to.equal(null);
             }
         })
@@ -143,7 +151,7 @@ describe("Logic component tests", function() {
         })
 
         it("Simple user delete player", async function() {
-            const res = await logicFacade.delPlayer(players[1].id, users[0].id);
+            const res = await errorWrapper(logicFacade.delPlayer(players[1].id, users[0].id));
             expect(res).to.equal(null);
             const fetchedPlayers = await logicFacade.getListOfPlayers();
             expect(players.length).to.equal(fetchedPlayers.length);
@@ -162,27 +170,30 @@ describe("Logic component tests", function() {
         })
 
         it("Delete player from team", async function() {
-            const res = await logicFacade.delPlayerFromTeam(players[0].id, teams[0].id, users[0].id);
-            expect(res).to.not.equal(null);
+            await logicFacade.delPlayerFromTeam(players[0].id, teams[0].id, users[0].id)
         })
 
         it("Delete other user's team players", async function() {
-            const res = await logicFacade.delPlayerFromTeam(players[0].id, teams[1].id, users[1].id);
+            const res = await errorWrapper(
+                logicFacade.delPlayerFromTeam(players[0].id, teams[1].id, users[1].id)
+            );
             expect(res).to.equal(null);
         })
 
         it("Add to other user's team", async function() {
-            const res = await logicFacade.addPlayerToTeam(players[0].id, teams[0].id, users[1].id);
+            const res = await errorWrapper(
+                logicFacade.addPlayerToTeam(players[0].id, teams[0].id, users[1].id)
+            );
             expect(res).to.equal(null);
         })
 
         it("Add to not existing team", async function() {
-            const res = await logicFacade.addPlayerToTeam(players[0].id, 55, users[0].id);
+            const res = await errorWrapper(logicFacade.addPlayerToTeam(players[0].id, 55, users[0].id));
             expect(res).to.equal(null);
         })
 
         it("Add not existing player", async function() {
-            const res = await logicFacade.addPlayerToTeam(55, teams[0].id, users[0].id);
+            const res = await errorWrapper(logicFacade.addPlayerToTeam(55, teams[0].id, users[0].id));
             expect(res).to.equal(null);
         })
     })
