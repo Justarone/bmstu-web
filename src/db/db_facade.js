@@ -74,7 +74,7 @@ exports.SqlDbFacade = class SqlDbFacade extends AbstractDbFacade {
 
     async delPlayer(playerId) {
         return convertResponse(await this.playersRepo.delPlayer(playerId, this.conn),
-            `Falied to delete player ${playerId}`);
+            `Failed to delete player ${playerId}`);
     }
 
     build_connect(params) {

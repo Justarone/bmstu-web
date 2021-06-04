@@ -36,10 +36,12 @@ exports.AuthState = class AuthState {
 
     toWaitNewLogin() { 
         this.inner = WAIT_NEW_LOGIN;
+        return this.inner;
     }
 
     toWaitLogin() {
         this.inner = WAIT_LOGIN;
+        return this.inner;
     }
 
     toWaitPassword() {

@@ -125,7 +125,7 @@ describe("Logic component tests", function() {
 
     describe("Players creation", function() {
         it("Admin user creates players", async function() {
-            console.log(users);
+            //console.log(users);
             for (i in players) {
                 const res = await logicFacade.addPlayer(players[i], users[2].id);
                 expect(res).to.not.equal(null);

@@ -1,9 +1,8 @@
 const { User } = require("./models");
-const { BaseError, LogicError } = require("./error");
+const { LogicError } = require("./error");
 
 const ADMIN_LEVEL = 1;
 
-const isError = e => e instanceof BaseError;
 const isAdmin = user => user.plevel === ADMIN_LEVEL;
 
 const getTeam = (user, teamId) => {
@@ -27,6 +26,11 @@ const hasPlayer = (team, playerId) => {
 
 const verifyPromo = promo => promo === "admin";
 
+const validateUserId = id => {
+    if (!id || !goodUserId(id))
+        throw new LogicError("Bad user id (null or can't be verified)");
+}
+
 const validateLoginPassword = (login, password) => {
     if (login.length < 3 || login.length > 20)
         throw new LogicError(`login length must be between 3 and 20`)
@@ -46,8 +50,7 @@ exports.LogicFacade = class LogicFacade {
     }
 
     async delPlayer(playerId, requesterId) {
-        if (!requesterId || !goodUserId(requesterId))
-            throw new LogicError("Bad user id (null or can't be verified)");
+        validateUserId(requesterId);
         const user = await this.dbFacade.getUser(requesterId);
         if (!user)
             throw new LogicError(`User with id ${requesterId} doesn't exists in db`);
@@ -57,8 +60,7 @@ exports.LogicFacade = class LogicFacade {
     }
 
     async addPlayer(player, requesterId) {
-        if (!requesterId || !goodUserId(requesterId))
-            throw new LogicError("Bad user id (null or can't be verified)");
+        validateUserId(requesterId);
         const user = await this.dbFacade.getUser(requesterId);
         if (!isAdmin(user))
             throw new LogicError(`Operation can be permitted only by admin`);
@@ -66,23 +68,20 @@ exports.LogicFacade = class LogicFacade {
     }
 
     async addTeam(team, requesterId) {
-        if (!requesterId || !goodUserId(requesterId))
-            throw new LogicError("Bad user id (null or can't be verified)");
+        validateUserId(requesterId);
         const user = await this.dbFacade.getUser(requesterId);
         team.ownerId = user.id;
         return this.dbFacade.addTeam(team, user.id);
     }
 
     async delTeam(teamId, requesterId) {
-        if (!requesterId || !goodUserId(requesterId))
-            throw new LogicError("Bad user id (null or can't be verified)");
+        validateUserId(requesterId);
         const user = await this.dbFacade.getUser(requesterId);
         return getTeam(user, teamId) && this.dbFacade.delTeam(teamId);
     }
 
     async addPlayerToTeam(playerId, teamId, requesterId) {
-        if (!requesterId || !goodUserId(requesterId))
-            throw new LogicError("Bad user id (null or can't be verified)");
+        validateUserId(requesterId);
         const user = await this.dbFacade.getUser(requesterId);
         const team = getTeam(user, teamId);
         if (hasPlayer(team, playerId))
@@ -91,8 +90,7 @@ exports.LogicFacade = class LogicFacade {
     }
 
     async delPlayerFromTeam(playerId, teamId, requesterId) {
-        if (!requesterId || !goodUserId(requesterId))
-            throw new LogicError("Bad user id (null or can't be verified)");
+        validateUserId(requesterId);
         const user = await this.dbFacade.getUser(requesterId);
         const team = getTeam(user, teamId); 
         return getPlayer(team, playerId) && this.dbFacade.delPlayerTeam(teamId, playerId);
@@ -113,15 +111,13 @@ exports.LogicFacade = class LogicFacade {
     }
 
     async getAllUserTeams(requesterId) {
-        if (!requesterId || !goodUserId(requesterId))
-            throw new LogicError("Bad user id (null or can't be verified)");
+        validateUserId(requesterId);
         const user = await this.dbFacade.getUser(requesterId);
         return user.teams;
     }
 
     async getTeamPlayers(teamId, requesterId) {
-        if (!requesterId || !goodUserId(requesterId))
-            throw new LogicError("Bad user id (null or can't be verified)");
+        validateUserId(requesterId);
         const user = await this.dbFacade.getUser(requesterId);
         return user && getTeam(user, teamId).players;
     }

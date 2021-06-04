@@ -1,8 +1,8 @@
-const WAIT_DEL = 0;
-const WAIT_FNAME = 1;
-const WAIT_LNAME = 2;
-const WAIT_CNTRY = 3;
-const WAIT_DOB = 4;
+const WAIT_DEL = 1;
+const WAIT_FNAME = 2;
+const WAIT_LNAME = 3;
+const WAIT_CNTRY = 4;
+const WAIT_DOB = 5;
 
 exports.PlayersState = class PlayersState {
     constructor() {

@@ -1,6 +1,6 @@
-const ERROR_CODE = -1;
 const { AuthPrinter } = require("./printer");
 const { AuthState } = require("./state");
+const { AppError } = require("../app/error");
 
 // it's better to move this to state
 class AuthInner {
@@ -22,54 +22,48 @@ exports.AuthManager = class AuthManager {
         if (this.state.isWaitNewLogin() || this.state.isWaitLogin()) {
             this.processLogin(rawRequest);
         } else if (this.state.isWaitPassword()) {
-            this.inner.password = rawRequest;
-            const id = await this.logicFacade.signIn(this.inner.login, rawRequest);
-            return id || ERROR_CODE;
+            return this.logicFacade.signIn(this.inner.login, rawRequest);
         } else if (this.state.isWaitNewPassword()) {
             return this.processNewPassword(rawRequest);
         } else if (this.state.isWaitPasswordAgain()) {
-            if (this.inner.password === rawRequest && this.state.toWaitPromo()) {
-                this.printer.invitePromo();
-                return null;
-            }
-            else
-                return ERROR_CODE;
+            if (this.inner.password !== rawRequest || !this.state.toWaitPromo())
+                throw new AppError("Failed to change state in auth manager!");
+            this.printer.invitePromo();
+            return null;
         } else if (this.state.isWaitPromo()) {
-            const res = await this.logicFacade.signUp(this.inner.login, this.inner.password, rawRequest);
-            return res || ERROR_CODE;
+            console.log(this.inner.login, this.inner.password, rawRequest);
+            return this.logicFacade.signUp(this.inner.login, this.inner.password, rawRequest);
         }
     }
 
     processLogin(rawRequest) {
         this.inner.login = rawRequest;
         const res = this.state.isWaitLogin() ? this.state.toWaitPassword() : this.state.toWaitNewPassword();
-        if (res) {
-            this.printer.invitePassword();
-            return null;
-        }
-        else 
-            return ERROR_CODE;
+        if (!res) 
+            throw new AppError("Failed to change state in auth manager!");
+        this.printer.invitePassword();
+        return null;
     }
 
     processNewPassword(rawRequest) {
         this.inner.password = rawRequest;
-        if (this.state.toWaitPasswordAgain()) {
-            this.printer.invitePassword();
-            return null;
-        }
-        else
-            return ERROR_CODE;
+        if (!this.state.toWaitPasswordAgain())
+            throw new AppError("Failed to change state in auth manager!");
+        this.printer.invitePassword();
+        return null;
     }
 
     startSignin() {
-        if (this.state.toWaitLogin())
-            this.printer.inviteLogin();
+        if (!this.state.toWaitLogin())
+            throw new AppError("Failed to change state in auth manager!");
+        this.printer.inviteLogin();
         return null;
     }
 
     startSignup() {
-        if (this.state.toWaitNewLogin())
-            this.printer.inviteLogin();
+        if (!this.state.toWaitNewLogin())
+            throw new AppError("Failed to change state in auth manager!");
+        this.printer.inviteLogin();
         return null;
     }
 }

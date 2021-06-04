@@ -33,10 +33,8 @@ const app = new App(logicFacade);
 const main = async () => {
     for (;;) {
         app.printInvite();
-        console.log();
         const request = question();
-        const res = await app.processRequest(request);
-        console.log(`query res: ${res}`);
+        await app.processRequest(request);
     }
 }
 
