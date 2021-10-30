@@ -7,6 +7,7 @@
 const { Pool } = require("pg");
 const { AbstractDbFacade } = require("../logic/db_interface");
 const { DbError } = require("./error");
+const { USER_ONLY } = require("../logic/logic_facade");
 
 exports.USERS_TABLE = "users";
 exports.TEAMS_TABLE = "teams";
@@ -32,8 +33,8 @@ exports.SqlDbFacade = class SqlDbFacade extends AbstractDbFacade {
             "No user with such login and password");
     }
 
-    async getUser(id) {
-        return convertResponse(await this.usersRepo.getUser(id, this.conn),
+    async getUser(id, buildLevel = USER_ONLY) {
+        return convertResponse(await this.usersRepo.getUser(id, this.conn, buildLevel),
             "No user with such id");
     }
 

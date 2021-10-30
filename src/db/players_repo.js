@@ -25,6 +25,7 @@ exports.PgPlayersRepo = class PgPlayersRepo extends AbstractPlayersRepo {
         const res = await performQuery(query, conn);
         if (!res)
             return null;
+        // NOTE: здесь могла бы быть сущность базы, но в этом нет большого смысла
         return res.rows.map(p => new Player(p.id, p.fname, p.lname, p.cntry, correctDate(p.dob)));
     }
 }

@@ -1,11 +1,12 @@
-const { User, Team, Player } = require("../logic/models");
+const {  User, Team, Player } = require("../logic/models");
+const { USER_ONLY, WITH_TEAMS, WITH_PLAYERS } = require("../logic/logic_facade");
 
 const { performQuery, PLAYERS_TABLE, USERS_TABLE, 
     TEAMS_TABLE, TEAM_PLAYER_TABLE, correctDate } = require("./db_facade");
 
 class AbstractUserRepo {
     async getUserId(_login, _password, _conn) {}
-    async getUser(_id, _conn) {}
+    async getUser(_id, _conn, _build_level) {}
     async addUser(_user, _conn) {}
     async userExists(_login, _conn) {}
 }
@@ -29,29 +30,37 @@ exports.PgUsersRepo = class PgUsersRepo extends AbstractUserRepo {
         return res && res.rows.length > 0 ? res.rows[0].id : null;
     }
 
-    async getUser(id, conn) {
+    async getUser(id, conn, buildLevel) {
         const query = `SELECT * FROM ${USERS_TABLE} WHERE id = ${id};`;
         const res = await performQuery(query, conn);
         if (!res || !res.rows.length) 
             return null;
-        const teams = await this.buildUserTeams(id, conn);
+
+        if (buildLevel === USER_ONLY) {
+            const { login, password, plevel } = res.rows[0];
+            return new User(id, login, password, [], plevel);
+        }
+
+        const teams = await this.buildUserTeams(id, conn, buildLevel);
         if (!teams)
             return null;
         const { login, password, plevel } = res.rows[0];
+        // NOTE: здесь могла бы быть сущность базы, но в этом нет большого смысла
         return new User(id, login, password, teams, plevel);
     }
 
-    async buildUserTeams(userId, conn) {
+    async buildUserTeams(userId, conn, buildLevel) {
         const query = `SELECT * FROM ${TEAMS_TABLE} WHERE owner_id = ${userId};`;
         const res = await performQuery(query, conn);
         if (!res) 
             return res;
         const teams = [];
-        for (const i in res.rows) {
-            const team = await this.buildTeam(res.rows[i], conn);
-            if (!team) 
-                return null;
-            teams.push(team);
+        for (const dbTeam of res.rows) {
+            const team = buildLevel === WITH_PLAYERS
+                ? await this.buildTeam(dbTeam, conn, buildLevel)
+                : new Team(dbTeam.id, [], dbTeam.owner_id, dbTeam.name);
+            if (team) 
+                teams.push(team);
         }
         return teams;
     }
@@ -63,7 +72,9 @@ exports.PgUsersRepo = class PgUsersRepo extends AbstractUserRepo {
         if (!res)
             return null;
         const players = res.rows
+        // NOTE: здесь могла бы быть сущность базы, но в этом нет большого смысла
             .map(obj => new Player(obj.id, obj.fname, obj.lname, obj.cntry, correctDate(obj.dob)));
+        // NOTE: здесь могла бы быть сущность базы, но в этом нет большого смысла
         return new Team(dbTeam.id, players, dbTeam.owner_id, dbTeam.name);
     }
 }

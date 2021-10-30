@@ -2,7 +2,7 @@
 class AbstractDbFacade {
     async userExists(_login) {}
     async getUserId(_login, _password) {}
-    async getUser(_id) {}
+    async getUser(_id, _buildLevel) {}
     async addUser(_user) {}
 
     async addTeam(_ownerId, _teamName) {}

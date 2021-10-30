@@ -9,7 +9,7 @@ const { question } = require("readline-sync");
 
 const USERNAME = "justarone";
 const HOST = "localhost";
-const DATABASE = "test_db";
+const DATABASE = "justarone";
 const PASSWORD = "password";
 const PORT = 5432;
 

@@ -6,6 +6,7 @@ const { PgPlayerTeamRepo } = require("../src/db/teamplayer_repo");
 const { expect } = require("chai");
 const exec = require("child_process").execSync;
 const { Player, Team, User } = require("../src/logic/models");
+const { WITH_PLAYERS, WITH_TEAMS } = require("../src/logic/logic_facade");
 
 const USERNAME = "justarone";
 const HOST = "localhost";
@@ -99,7 +100,7 @@ describe("Database access component tests", function() {
             }
             const gotUsers = [];
             for (i in users) {
-                const gotUser = await dbFacade.getUser(users[i].id);
+                const gotUser = await dbFacade.getUser(users[i].id, WITH_TEAMS);
                 expect(gotUser).to.not.equal(null);
                 gotUsers.push(gotUser);
             }
@@ -111,7 +112,7 @@ describe("Database access component tests", function() {
             expect(opres).to.not.equal(null);
             opres = await dbFacade.delTeam(3);
             expect(opres).to.not.equal(null);
-            const user3 = await dbFacade.getUser(3);
+            const user3 = await dbFacade.getUser(3, WITH_TEAMS);
             expect(user3).to.not.equal(null);
             team.id = 4;
             users[2].teams = [team];
@@ -126,7 +127,7 @@ describe("Database access component tests", function() {
                 users[0].teams[0].players.push(players[i]);
                 const opres = await dbFacade.addPlayerTeam(users[0].teams[0].id, players[i].id);
                 expect(opres).to.not.equal(null);
-                const newUser = await dbFacade.getUser(users[0].id);
+                const newUser = await dbFacade.getUser(users[0].id, WITH_PLAYERS);
                 expect(newUser).to.not.equal(null);
                 expect(newUser).deep.equal(users[0]);
             }
@@ -135,7 +136,7 @@ describe("Database access component tests", function() {
             users[0].teams[0].players.pop();
             const opres = await dbFacade.delPlayerTeam(users[0].teams[0].id, players[1].id);
             expect(opres).to.not.equal(null);
-            const newUser = await dbFacade.getUser(users[0].id);
+            const newUser = await dbFacade.getUser(users[0].id, WITH_PLAYERS);
             expect(newUser).to.not.equal(null);
             expect(newUser).deep.equal(users[0]);
             

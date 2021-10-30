@@ -3,6 +3,14 @@ const { LogicError } = require("./error");
 
 const ADMIN_LEVEL = 1;
 
+// user build levels
+USER_ONLY = 0;
+exports.USER_ONLY = USER_ONLY;
+WITH_TEAMS = 1;
+exports.WITH_TEAMS = WITH_TEAMS;
+WITH_PLAYERS = 2;
+exports.WITH_PLAYERS = WITH_PLAYERS;
+
 const isAdmin = user => user.plevel === ADMIN_LEVEL;
 
 const getTeam = (user, teamId) => {
@@ -51,7 +59,7 @@ exports.LogicFacade = class LogicFacade {
 
     async delPlayer(playerId, requesterId) {
         validateUserId(requesterId);
-        const user = await this.dbFacade.getUser(requesterId);
+        const user = await this.dbFacade.getUser(requesterId, USER_ONLY);
         if (!user)
             throw new LogicError(`User with id ${requesterId} doesn't exists in db`);
         if (!isAdmin(user))
@@ -61,7 +69,7 @@ exports.LogicFacade = class LogicFacade {
 
     async addPlayer(player, requesterId) {
         validateUserId(requesterId);
-        const user = await this.dbFacade.getUser(requesterId);
+        const user = await this.dbFacade.getUser(requesterId, USER_ONLY);
         if (!isAdmin(user))
             throw new LogicError(`Operation can be permitted only by admin`);
         return this.dbFacade.addPlayer(player);
@@ -69,29 +77,29 @@ exports.LogicFacade = class LogicFacade {
 
     async addTeam(team, requesterId) {
         validateUserId(requesterId);
-        const user = await this.dbFacade.getUser(requesterId);
+        const user = await this.dbFacade.getUser(requesterId, USER_ONLY);
         team.ownerId = user.id;
         return this.dbFacade.addTeam(team, user.id);
     }
 
     async delTeam(teamId, requesterId) {
         validateUserId(requesterId);
-        const user = await this.dbFacade.getUser(requesterId);
+        const user = await this.dbFacade.getUser(requesterId, WITH_TEAMS);
         return getTeam(user, teamId) && this.dbFacade.delTeam(teamId);
     }
 
     async addPlayerToTeam(playerId, teamId, requesterId) {
         validateUserId(requesterId);
-        const user = await this.dbFacade.getUser(requesterId);
+        const user = await this.dbFacade.getUser(requesterId, WITH_PLAYERS);
         const team = getTeam(user, teamId);
         if (hasPlayer(team, playerId))
-            throw new LogicError(`Player ${playerId} doesn't exist in team ${teamId}`);
+            throw new LogicError(`Player ${playerId} already exists in team ${teamId}`);
         return this.dbFacade.addPlayerTeam(teamId, playerId);
     }
 
     async delPlayerFromTeam(playerId, teamId, requesterId) {
         validateUserId(requesterId);
-        const user = await this.dbFacade.getUser(requesterId);
+        const user = await this.dbFacade.getUser(requesterId, WITH_PLAYERS);
         const team = getTeam(user, teamId); 
         return getPlayer(team, playerId) && this.dbFacade.delPlayerTeam(teamId, playerId);
     }
@@ -112,13 +120,13 @@ exports.LogicFacade = class LogicFacade {
 
     async getAllUserTeams(requesterId) {
         validateUserId(requesterId);
-        const user = await this.dbFacade.getUser(requesterId);
+        const user = await this.dbFacade.getUser(requesterId, WITH_PLAYERS);
         return user.teams;
     }
 
     async getTeamPlayers(teamId, requesterId) {
         validateUserId(requesterId);
-        const user = await this.dbFacade.getUser(requesterId);
+        const user = await this.dbFacade.getUser(requesterId, WITH_PLAYERS);
         return user && getTeam(user, teamId).players;
     }
 }
