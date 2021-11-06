@@ -6,7 +6,7 @@ info:
   termsOfService: "https://google.com"
   contact:
     email: "p_perestoronin@mail.ru"
-host: "localhost"
+host: "localhost:3000"
 basePath: "/api"
 tags:
 - name: "player"
@@ -43,6 +43,8 @@ paths:
         schema:
           $ref: "#/definitions/Player"
       responses:
+        "200":
+          description: "Ok"
         "403":
           description: "No enough rights"
         "405":
@@ -325,9 +327,7 @@ paths:
       tags:
       - "user"
       summary: "Create user"
-      security:
-        - cookieAuth: []
-      description: "This can only be done by the logged in user."
+      description: ""
       operationId: "createUser"
       produces:
       - "application/json"
@@ -337,10 +337,35 @@ paths:
         description: "Created user object"
         required: true
         schema:
-          $ref: "#/definitions/User"
+          $ref: "#/definitions/UserWithPass"
       responses:
         default:
           description: "successful operation"
+
+    put:
+      tags:
+      - "user"
+      summary: "Update user"
+      description: ""
+      operationId: "updateUser"
+      security:
+        - cookieAuth: []
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "Created user object"
+        required: true
+        schema:
+          $ref: "#/definitions/UserWithPass"
+      responses:
+        "200":
+          description: "Ok"
+        "403":
+          description: "No enough rights"
+        "405":
+          description: "Invalid input"
 
   /user/login:
     get:
@@ -370,10 +395,6 @@ paths:
           headers:
             Set-Cookie:
               type: "string"
-            X-Expires-After:
-              type: "string"
-              format: "date-time"
-              description: "date in UTC when token expires"
         "400":
           description: "Invalid username/password supplied"
   /user/logout:
@@ -382,6 +403,8 @@ paths:
       - "user"
       summary: "Logs out current logged in user session"
       description: ""
+      security:
+        - cookieAuth: []
       operationId: "logoutUser"
       produces:
       - "application/json"
@@ -411,33 +434,6 @@ paths:
             $ref: "#/definitions/User"
         "400":
           description: "Invalid username supplied"
-        "404":
-          description: "User not found"
-    put:
-      tags:
-      - "user"
-      summary: "Updated user"
-      description: "This can only be done by the logged in user."
-      operationId: "updateUser"
-      security:
-        - cookieAuth: []
-      produces:
-      - "application/json"
-      parameters:
-      - name: "username"
-        in: "path"
-        description: "name that need to be updated"
-        required: true
-        type: "string"
-      - in: "body"
-        name: "body"
-        description: "Updated user object"
-        required: true
-        schema:
-          $ref: "#/definitions/User"
-      responses:
-        "400":
-          description: "Invalid user supplied"
         "404":
           description: "User not found"
     #delete:
@@ -473,6 +469,20 @@ definitions:
       plevel:
         type: "boolean"
         default: false
+
+  UserWithPass:
+    type: "object"
+    properties:
+      id:
+        type: "integer"
+        format: "int64"
+      login:
+        type: "string"
+      plevel:
+        type: "boolean"
+        default: false
+      password:
+        type: "string"
 
   Team:
     type: "object"
@@ -510,17 +520,6 @@ definitions:
       lname:
         type: "string"
       cntry:
-        type: "string"
-
-  ApiResponse:
-    type: "object"
-    properties:
-      code:
-        type: "integer"
-        format: "int32"
-      type:
-        type: "string"
-      message:
         type: "string"
 
 securityDefinitions:
