@@ -1,8 +1,19 @@
 "use strict";
 
-module.exports.login = (_req, res, _next) => {
+const { authService, usersService } = require("../init");
+const { InvalidArgumentError } = require("../../logic/error");
+const { DTOUserLoginInfo, DTOUser, DTOUserWithPass } = require("../models");
+const { safetyWrapper } = require("../common");
+
+module.exports.login = (req, res, _next) => {
     console.log("login");
-    res.status(200).send("ok");
+    safetyWrapper(res, async () => {
+        // NOTE: возможно, так делать не очень хорошо...
+        const { login, password } = new DTOUserLoginInfo(req.body);
+        const token = await authService.login(login, password);
+        // TODO: somhow link token
+        res.status(200).send(`${token}`);
+    });
 };
 
 module.exports.logout = (_req, res, _next) => {
@@ -15,12 +26,21 @@ module.exports.getByUsername = (_req, res, _next) => {
     res.status(200).send("ok");
 };
 
-module.exports.updateUser = (_req, res, _next) => {
+module.exports.updateUser = (req, res, _next) => {
     console.log("updateUser");
-    res.status(200).send("ok");
+    safetyWrapper(res, async () => {
+        const user = (new DTOUserWithPass(req.body)).toUser();
+        await usersService.updateUser(user);
+        res.status(200).send("ok");
+    });
 };
 
-module.exports.createUser = (_req, res, _next) => {
+module.exports.createUser = (req, res, _next) => {
     console.log("createUser");
-    res.status(200).send("ok");
+    safetyWrapper(res, async () => {
+        const user = (new DTOUserWithPass(req.body)).toUser();
+        const id = await usersService.addUser(user);
+        // TODO: Наверное, здесь надо сгенерить токен?!
+        res.status(200).send('');
+    });
 };

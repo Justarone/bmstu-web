@@ -9,8 +9,8 @@ router.post("/login", controllers.login);
 router.post("/logout", controllers.logout);
 
 router.patch("/:username", controllers.getByUsername);
-router.put("/:userId", controllers.updateUser);
 
+router.put("/", controllers.updateUser);
 router.post("/", controllers.createUser);
 
 module.exports = router;

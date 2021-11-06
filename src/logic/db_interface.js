@@ -1,19 +1,25 @@
-// notice that every method returns promise
-class AbstractDbFacade {
-    async userExists(_login) {}
-    async getUserId(_login, _password) {}
-    async getUser(_id, _buildLevel) {}
-    async addUser(_user) {}
-
-    async addTeam(_ownerId, _teamName) {}
-    async delTeam(_teamId) {}
-
-    async addPlayerTeam(_teamId, _playerId) {}
-    async delPlayerTeam(_teamId, _playerId) {}
-
-    async addPlayer(_fname, _lname, _cntry, _dob) {}
-    async getPlayers() {}
+exports.AbstractPlayersRepo = class AbstractPlayersRepo {
     async delPlayer(_playerId) {}
+    async addPlayer(_player) {}
+    async updatePlayer(_player) {}
+    async getPlayers() {}
+    async getPlayersFromTeam(_teamId) {}
+    async delPlayerFromTeam(_teamId, _playerId) {}
+    async addPlayerToTeam(_playerId, _teamId) {}
 };
 
-exports.AbstractDbFacade = AbstractDbFacade;
+exports.AbstractUserRepo = class AbstractUserRepo {
+    async getUser(_id) {}
+    async getUserByUsername(_username) {}
+    async addUser(_user) {}
+    async removeUser(_id) {}
+    async updateUser(_user) {}
+}
+
+exports.AbstractTeamsRepo = class AbstractTeamsRepo {
+    async addTeam(_team) {}
+    async updateTeam(_team) {}
+    async getTeams() {}
+    async getUserTeams(_userId) {}
+    async delTeam(_teamId) {}
+};

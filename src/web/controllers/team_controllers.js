@@ -1,22 +1,16 @@
 "use strict";
 
-const defaultTeam = {
-    id: 1,
-    name: "Team1",
-    ownerId: 1,
-};
-
-const defaultPlayer = {
-    id: 1,
-    fname: "Ivan",
-    lname: "Ivanov",
-    dob: "2000-01-01 12:12:12",
-    cntry: "Russia"
-};
+const { teamsService } = require("../init");
+const { InvalidArgumentError } = require("../../logic/error");
+const { DTOTeam } = require("../models");
+const { safetyWrapper } = require("../common");
 
 module.exports.addPlayerToTeam = (_req, res, _next) => {
     console.log("addPlayerToTeam");
-    res.status(200).send("ok");
+    safetyWrapper(res, async () => {
+
+        res.status(200).send("ok");
+    });
 };
 
 module.exports.getAllPlayersFromTeam = (_req, res, _next) => {

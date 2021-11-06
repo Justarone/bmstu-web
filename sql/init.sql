@@ -15,7 +15,7 @@ CREATE TABLE IF NOT EXISTS teams (
     id serial primary key,
     name varchar,
     owner_id int,
-    FOREIGN KEY (owner_id) REFERENCES users (id)
+    FOREIGN KEY (owner_id) REFERENCES users (id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS players (
@@ -29,6 +29,6 @@ CREATE TABLE IF NOT EXISTS players (
 CREATE TABLE IF NOT EXISTS teamplayer (
     team_id int,
     player_id int,
-    FOREIGN KEY (team_id) REFERENCES teams (id),
-    FOREIGN KEY (player_id) REFERENCES players (id)
+    FOREIGN KEY (team_id) REFERENCES teams (id) ON DELETE CASCADE,
+    FOREIGN KEY (player_id) REFERENCES players (id) ON DELETE CASCADE
 );

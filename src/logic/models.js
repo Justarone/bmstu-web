@@ -1,9 +1,8 @@
 exports.User = class User {
-    constructor(id, login, password, teams, plevel) {
+    constructor(id, login, password, plevel) {
         this.id = id;
         this.login = login;
         this.password = password;
-        this.teams = teams;
         this.plevel = plevel;
     }
 };
@@ -19,9 +18,8 @@ exports.Player = class Player {
 };
 
 exports.Team = class Team {
-    constructor(id, players, ownerId, name) {
+    constructor(id, ownerId, name) {
         this.id = id;
-        this.players = players;
         this.ownerId = ownerId;
         this.name = name;
     }

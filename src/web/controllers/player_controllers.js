@@ -1,32 +1,65 @@
-const defaultPlayer = {
-    id: 1,
-    fname: "Ivan",
-    lname: "Ivanov",
-    dob: "2000-01-01 12:12:12",
-    cntry: "Russia"
-};
+"use strict";
 
-module.exports.getPlayer = (_req, res, _next) => {
+const { playersService } = require("../init");
+const {InvalidArgumentError} = require("../../logic/error");
+const { DTOPlayerUpdInfo, DTOPlayer } = require("../models");
+const { safetyWrapper } = require("../common");
+
+module.exports.getPlayer = (req, res, _next) => {
     console.log("getPlayer");
-    res.status(200).send(JSON.stringify(defaultPlayer));
+    safetyWrapper(res, async () => {
+        const id = req.params && req.params.playerId && parseInt(req.params.playerId);
+        if (!id)
+            throw InvalidArgumentError("failed to parse id");
+        const player = await playersService.getPlayerById(id);
+        res.status(200).json(player);
+    });
 };
 
-module.exports.modifyPlayer = (_req, res, _next) => {
+module.exports.modifyPlayer = (req, res, _next) => {
     console.log("modifyPlayer");
-    res.status(200).send("ok");
+    safetyWrapper(res, async () => {
+        const player = new DTOPlayerUpdInfo(req.body);
+        if (!player)
+            throw InvalidArgumentError("Can't parse player");
+        const playerId = req.params && req.params.playerId && parseInt(req.params.playerId);
+        if (!playerId)
+            throw InvalidArgumentError("Can't parse player id");
+
+        let realPlayer = await playersService.getPlayerById(playerId);
+        Object.entries(player).forEach(([k, v]) => realPlayer[k] = v);
+
+        await playersService.updatePlayer(realPlayer, req.user);
+        res.status(200).send("ok");
+    });
 };
 
-module.exports.deletePlayer = (_req, res, _next) => {
+module.exports.deletePlayer = (req, res, _next) => {
     console.log("deletePlayer");
-    res.status(200).send("ok");
+    safetyWrapper(res, async () => {
+        const playerId = req.params && req.params.playerId && parseInt(req.params.playerId);
+        if (!playerId)
+            throw InvalidArgumentError("Can't parse player id");
+        await playersService.removePlayer(playerId, req.user);
+        res.status(200).send("ok");
+    });
 };
 
 module.exports.getAllPlayers = (_req, res, _next) => {
     console.log("getAllPlayers");
-    res.status(200).send(JSON.stringify([defaultPlayer, defaultPlayer]));
+    safetyWrapper(res, async () => {
+        const players = await playersService.getPlayers();
+        res.status(200).json(players);
+    });
 };
 
-module.exports.postPlayer = (_req, res, _next) => {
+module.exports.postPlayer = (req, res, _next) => {
     console.log("postPlayer");
-    res.status(200).send("ok");
+    safetyWrapper(res, async () => {
+        const player = new DTOPlayer(req.body);
+        if (!player)
+            throw InvalidArgumentError("Can't parse player");
+        await playersService.addPlayer(player, req.user);
+        res.status(200).send("ok");
+    });
 };

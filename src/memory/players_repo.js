@@ -1,40 +1,29 @@
-const { performQuery, performUpdate, performInsert, performDelete, build_update_list, PLAYERS_TABLE, correctDate } = require("./common");
+const { correctDate } = require("../db/common");
 const { AbstractPlayersRepo } = require("../logic/db_interface");
-const { DbPlayer } = require("../db/models");
-const { NotFoundError, DbError, PermissionError } = require("../logic/error");
 
-exports.PgPlayersRepo = class PgPlayersRepo extends AbstractPlayersRepo {
-    constructor(conn) {
-        super();
-        this.conn = conn;
+exports.MemoryPlayersRepo = class MemoryPlayersRepo extends AbstractPlayersRepo {
+    constructor() {
+        this.storage = [];
     }
 
     async delPlayer(playerId) {
-        const query = `DELETE FROM ${PLAYERS_TABLE} WHERE id = ${playerId}`;
-        const res = await performDelete(query, this.conn);
+        const new_state = this.storage.filter(p => p.id != playerId);
+        if (new_state.length === this.storage.length)
+            throw NotFound()
     }
 
     async addPlayer(player) {
-        const id_query = `SELECT nextval('${PLAYERS_TABLE + '_id_seq'}') as id;`;
+        const id_query = `SELECT nextval(${USERS_TABLE + '_id_seq'});`;
         const id_query_res = await performQuery(id_query, this.conn);
         if (!id_query_res || id_query_res.rows.length === 0)
-            throw new DbError("Something went wrong with id fetching");
+            return null;
 
-        const id = id_query_res.rows[0].id;
-
+        const id = +id_query_res.rows[0];
         const dob = player.dob.toISOString();
         const query = `INSERT INTO ${PLAYERS_TABLE} (id, fname, lname, cntry, dob) VALUES \
             (${id}, '${player.fname}', '${player.lname}', '${player.cntry}', '${dob}');`;
-
-        await performInsert(query, this.conn);
+        await performQuery(query, this.conn);
         return id;
-    }
-
-    async updatePlayer(player) {
-        player.dob = player.dob.toISOString();
-        const update_list = build_update_list(player);
-        const query = `UPDATE ${PLAYERS_TABLE} SET ${update_list} WHERE id = ${player.id};`;
-        await performUpdate(query, this.conn);
     }
 
     async getPlayers() {
@@ -48,13 +37,13 @@ exports.PgPlayersRepo = class PgPlayersRepo extends AbstractPlayersRepo {
     async addPlayerToTeam(playerId, teamId) {
         const query = `INSERT INTO ${TEAM_PLAYER_TABLE} (team_id, player_id) VALUES \
             ('${teamId}', '${playerId}');`;
-        await performInsert(query, this.conn);
+        return performQuery(query, this.conn);
     }
 
     async delPlayerFromTeam(teamId, playerId) {
         const query = `DELETE FROM ${TEAM_PLAYER_TABLE} WHERE team_id = '${teamId}' AND \
             player_id = '${playerId}';`;
-        await performDelete(query, this.conn);
+        return performQuery(query, this.conn);
     }
 
     async getPlayersFromTeam(teamId) {
@@ -66,3 +55,4 @@ exports.PgPlayersRepo = class PgPlayersRepo extends AbstractPlayersRepo {
             : null;
     }
 }
+

@@ -1,36 +1,9 @@
 const { User } = require("./models");
-const { LogicError } = require("./error");
+const { PermissionError, NotFoundError, LogicError } = require("./error");
 
 const ADMIN_LEVEL = 1;
 
-// user build levels
-USER_ONLY = 0;
-exports.USER_ONLY = USER_ONLY;
-WITH_TEAMS = 1;
-exports.WITH_TEAMS = WITH_TEAMS;
-WITH_PLAYERS = 2;
-exports.WITH_PLAYERS = WITH_PLAYERS;
-
 const isAdmin = user => user.plevel === ADMIN_LEVEL;
-
-const getTeam = (user, teamId) => {
-    const res = user.teams.find(team => team.id === teamId);
-    if (!res)
-        throw new LogicError(`User ${user.id} hasn't team ${teamId}`);
-    return res;
-}
-
-const getPlayer = (team, playerId) => {
-    const res = team.players.find(p => p.id === playerId);
-    if (!res)
-        throw new LogicError(`There is no player ${playerId} in team ${team.id}`);
-    return res;
-}
-
-const hasPlayer = (team, playerId) => {
-    const res = team.players.find(p => p.id === playerId);
-    return res ? true : false;
-}
 
 const verifyPromo = promo => promo === "admin";
 
@@ -48,85 +21,148 @@ const validateLoginPassword = (login, password) => {
 
 const goodUserId = id => id > 0;
 
-exports.LogicFacade = class LogicFacade {
-    constructor(dbFacade) {
-        this.dbFacade = dbFacade;
+// =============================================================================
+
+module.exports.UsersService = class UsersService {
+    constructor(usersRepo) {
+        this.usersRepo = usersRepo;
     }
 
-    async getListOfPlayers() {
-        return this.dbFacade.getPlayers();
+    async addUser(user) {
+        return this.usersRepo.addUser(user);
     }
 
-    async delPlayer(playerId, requesterId) {
-        validateUserId(requesterId);
-        const user = await this.dbFacade.getUser(requesterId, USER_ONLY);
-        if (!user)
-            throw new LogicError(`User with id ${requesterId} doesn't exists in db`);
-        if (!isAdmin(user))
-            throw new LogicError(`Operation can be permitted only by admin`);
-        return this.dbFacade.delPlayer(playerId);
+    async updateUser(user) {
+        return this.usersRepo.updateUser(user);
     }
 
-    async addPlayer(player, requesterId) {
-        validateUserId(requesterId);
-        const user = await this.dbFacade.getUser(requesterId, USER_ONLY);
-        if (!isAdmin(user))
-            throw new LogicError(`Operation can be permitted only by admin`);
-        return this.dbFacade.addPlayer(player);
+    async getUserByUsername(username) {
+        return this.userRepo.getUserByUsername(username);
+    }
+};
+
+module.exports.PlayersService = class PlayersService {
+    constructor(playersRepo) {
+        this.playersRepo = playersRepo;
     }
 
-    async addTeam(team, requesterId) {
-        validateUserId(requesterId);
-        const user = await this.dbFacade.getUser(requesterId, USER_ONLY);
-        team.ownerId = user.id;
-        return this.dbFacade.addTeam(team, user.id);
+    async addPlayer(player, requester) {
+        if (requester.plevel != ADMIN_LEVEL)
+            throw new PermissionError("No enough rights");
+        return this.playersRepo.addPlayer(player);
     }
 
-    async delTeam(teamId, requesterId) {
-        validateUserId(requesterId);
-        const user = await this.dbFacade.getUser(requesterId, WITH_TEAMS);
-        return getTeam(user, teamId) && this.dbFacade.delTeam(teamId);
+    async removePlayer(playerId, requester) {
+        // NOTE: need to check if player exists?!
+        if (requester.plevel != ADMIN_LEVEL)
+            throw new PermissionError("No enough rights");
+        await this.playersRepo.delPlayer(playerId);
     }
 
-    async addPlayerToTeam(playerId, teamId, requesterId) {
-        validateUserId(requesterId);
-        const user = await this.dbFacade.getUser(requesterId, WITH_PLAYERS);
-        const team = getTeam(user, teamId);
-        if (hasPlayer(team, playerId))
-            throw new LogicError(`Player ${playerId} already exists in team ${teamId}`);
-        return this.dbFacade.addPlayerTeam(teamId, playerId);
+    async getPlayers() {
+        return this.playersRepo.getPlayers();
     }
 
-    async delPlayerFromTeam(playerId, teamId, requesterId) {
-        validateUserId(requesterId);
-        const user = await this.dbFacade.getUser(requesterId, WITH_PLAYERS);
-        const team = getTeam(user, teamId); 
-        return getPlayer(team, playerId) && this.dbFacade.delPlayerTeam(teamId, playerId);
+    async getPlayerById(playerId) {
+        const players = await this.getPlayers();
+        const res = players.find(p => p.id == playerId);
+        if (!res)
+            throw new NotFoundError("Player not found");
+        return res;
     }
 
-    async signUp(login, password, promo) {
-        validateLoginPassword(login, password)
-        const exists = await this.dbFacade.userExists(login);
-        if (exists)
-            throw new LogicError(`User with login ${login} already exists`);
-        const user = new User(0, login, password, [], verifyPromo(promo) ? 1 : 0);
-        return this.dbFacade.addUser(user);
+    async updatePlayer(player, requester) {
+        if (requester.plevel != ADMIN_LEVEL)
+            throw new PermissionError("No enough rights");
+        await this.playersRepo.updatePlayer(player);
     }
 
-    async signIn(login, password) {
-        validateLoginPassword(login, password)
-        return this.dbFacade.getUserId(login, password);
+    async getPlayersFromTeam(teamId) {
+        return this.playersRepo.getPlayersFromTeam(teamId);
     }
 
-    async getAllUserTeams(requesterId) {
-        validateUserId(requesterId);
-        const user = await this.dbFacade.getUser(requesterId, WITH_PLAYERS);
-        return user.teams;
+    async verifyPlayerInTeam(teamId, playerId) {
+        const squad = await this.playersRepo.getPlayersFromTeam(teamId);
+        const res = squad.find(p => p.id == playerId);
+        if (!res)
+            throw new NotFoundError("Player not found in team");
     }
 
-    async getTeamPlayers(teamId, requesterId) {
-        validateUserId(requesterId);
-        const user = await this.dbFacade.getUser(requesterId, WITH_PLAYERS);
-        return user && getTeam(user, teamId).players;
+    async addPlayerToTeam(teamId, playerId) {
+        await this.playersRepo.addPlayerToTeam(teamId, playerId);
+    }
+
+    async removePlayerFromTeam(teamId, playerId) {
+        await this.playersRepo.delPlayerFromTeam(teamId, playerId);
     }
 }
+
+module.exports.TeamsService = class TeamsService {
+    constructor(teamsRepo) {
+        this.teamsRepo = teamsRepo;
+    }
+
+    async getTeams() {
+        return this.teamsRepo.getTeams();
+    }
+
+    async addTeam(team) {
+        await this.teamsRepo.addTeam(team);
+    }
+
+    async getTeamById(teamId) {
+        const teams = await this.getTeams();
+        const res = teams.find(t => t.id == teamId);
+        if (!res)
+            throw new NotFoundError(`Team with id ${teamId} doesn't exist`);
+        return res;
+    }
+
+    async removeTeam(teamId) {
+        await this.teamsRepo.delTeam(teamId);
+    }
+
+    async updateTeam(team) {
+        await this.teamsRepo.updateTeam(team);
+    }
+
+    async userTeams(userId) {
+        return this.teamsRepo.getUserTeams(userId);
+    }
+}
+
+
+module.exports.AuthService = class AuthService {
+    constructor(usersRepo) {
+        this.usersRepo = usersRepo;
+    }
+
+    // should be prepared by controller
+    async login(login, password) {
+        const dbUser = await this.usersRepo.getUserByUsername(login);
+        if (!dbUser)
+            throw new NotFoundError("User not found in database");
+        if (dbUser.password != password)
+            throw new PermissionError("Wrong password");
+        return this.generateToken(dbUser);
+    }
+
+    generateToken(user) {
+        return JSON.stringify(user);
+    }
+
+    async verify(_token) {
+        // TODO: FIX!!!
+        return true;
+    }
+
+    async extractInfoFromToken(token) {
+        return JSON.parse(token);
+    }
+
+    async logout(_token) {
+        // maybe add to blacklist or something like that?
+    }
+}
+
+
