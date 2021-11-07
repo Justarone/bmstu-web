@@ -1,31 +1,56 @@
 "use strict";
 
-const { teamsService } = require("../init");
+const { playersService, teamsService } = require("../init");
 const { InvalidArgumentError } = require("../../logic/error");
 const { DTOTeam } = require("../models");
 const { safetyWrapper } = require("../common");
 
-module.exports.addPlayerToTeam = (_req, res, _next) => {
+module.exports.addPlayerToTeam = (req, res, _next) => {
     console.log("addPlayerToTeam");
     safetyWrapper(res, async () => {
-
+        const playerId = res.body && parseInt(res.body);
+        if (!playerId)
+            throw new InvalidArgumentError("Can't parse player ID in body");
+        await playersService.addPlayerToTeam(req.params.playerId, playerId);
         res.status(200).send("ok");
     });
 };
 
 module.exports.getAllPlayersFromTeam = (_req, res, _next) => {
     console.log("getAllPlayersFromTeam");
-    res.status(200).send(JSON.stringify([defaultPlayer, defaultPlayer]));
+    safetyWrapper(res, async () => {
+        const teamId = req.params.teamId && parseInt(req.params.teamId);
+        if (!teamId)
+            throw new InvalidArgumentError("Can't parse team ID");
+        const players = await playersService.getPlayersFromTeam(teamId);
+        res.status(200).json(players);
+    });
 };
 
 module.exports.getTeam = (_req, res, _next) => {
     console.log("getTeam");
-    res.status(200).send(JSON.stringify(defaultTeam));
+    safetyWrapper(res, async () => {
+        const teamId = req.params.teamId && parseInt(req.params.teamId);
+        if (!teamId)
+            throw new InvalidArgumentError("Can't parse team ID");
+        const team = await teamsService.getTeamById(teamId);
+        if (!team)
+            throw new NotFoundError("Team wasn't found");
+        res.status(200).json(team);
+    });
 };
 
 module.exports.updateTeamName = (_req, res, _next) => {
     console.log("updateTeamName");
-    res.status(200).send("ok");
+    safetyWrapper(res, async () => {
+        const teamId = req.params.teamId && parseInt(req.params.teamId);
+        if (!teamId)
+            throw new InvalidArgumentError("Can't parse team ID");
+        const newName = req.body;
+        const ownerId = req.user.id || 1;
+        await teamsService.updateTeamName(teamId, newName);
+        res.status(200).send("ok");
+    });
 };
 
 module.exports.deleteTeam = (_req, res, _next) => {

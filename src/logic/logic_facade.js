@@ -1,7 +1,10 @@
 const { User } = require("./models");
 const { PermissionError, NotFoundError, LogicError } = require("./error");
+const jwt = require("jsonwebtoken");
+const sha256 = require("js-sha256");
 
 const ADMIN_LEVEL = 1;
+const SECRET = "my_secret";
 
 const isAdmin = user => user.plevel === ADMIN_LEVEL;
 
@@ -11,6 +14,8 @@ const validateUserId = id => {
     if (!id || !goodUserId(id))
         throw new LogicError("Bad user id (null or can't be verified)");
 }
+
+const mapPassword = password => sha256(password);
 
 const validateLoginPassword = (login, password) => {
     if (login.length < 3 || login.length > 20)
@@ -29,15 +34,18 @@ module.exports.UsersService = class UsersService {
     }
 
     async addUser(user) {
+        user.password = mapPassword(user.password)
         return this.usersRepo.addUser(user);
     }
 
     async updateUser(user) {
+        // TODO: remove password update
+        user.password = mapPassword(user.password)
         return this.usersRepo.updateUser(user);
     }
 
     async getUserByUsername(username) {
-        return this.userRepo.getUserByUsername(username);
+        return this.usersRepo.getUserByUsername(username);
     }
 };
 
@@ -53,7 +61,7 @@ module.exports.PlayersService = class PlayersService {
     }
 
     async removePlayer(playerId, requester) {
-        // NOTE: need to check if player exists?!
+        console.log(JSON.stringify(requester));
         if (requester.plevel != ADMIN_LEVEL)
             throw new PermissionError("No enough rights");
         await this.playersRepo.delPlayer(playerId);
@@ -142,26 +150,50 @@ module.exports.AuthService = class AuthService {
         const dbUser = await this.usersRepo.getUserByUsername(login);
         if (!dbUser)
             throw new NotFoundError("User not found in database");
-        if (dbUser.password != password)
+        if (dbUser.password != mapPassword(password))
             throw new PermissionError("Wrong password");
+        dbUser.password = '';
         return this.generateToken(dbUser);
     }
 
     generateToken(user) {
-        return JSON.stringify(user);
+        return jwt.sign({
+          data: JSON.stringify(user)
+        }, SECRET, { expiresIn: '1h' });
     }
 
-    async verify(_token) {
-        // TODO: FIX!!!
-        return true;
+    async verify(token) {
+        try {
+            jwt.verify(token, SECRET);
+        } catch(e) {
+            throw new PermissionError("Failed to verify token");
+        }
+    }
+
+    async extractToken(req) {
+        if (req.headers.authorization && req.headers.authorization.split(' ')[0] === 'Bearer')
+            return req.headers.authorization.split(' ')[1];
+        else if (req.cookies.jwtToken)
+            return req.cookies.jwtToken;
+        else if (req.params && req.params.token)
+            return req.params.token;
+        throw new PermissionError("Can't find token");
     }
 
     async extractInfoFromToken(token) {
-        return JSON.parse(token);
+        return JSON.parse(jwt.decode(token).data);
     }
 
     async logout(_token) {
         // maybe add to blacklist or something like that?
+    }
+
+    async resetHeader(res) {
+        res.clearCookie("jwtToken");
+    }
+
+    async setHeader(res, token) {
+        res.cookie("jwtToken", `${token}`);
     }
 }
 
