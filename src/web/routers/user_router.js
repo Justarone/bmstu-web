@@ -16,7 +16,7 @@ const team_router = express.Router();
  * @operationId loginUser
  * @produces application/json
  * @consumes application/json
- * @returns {string} 200 - ok
+ * @returns {string} 200 - ok (token)
  * @returns {string} 404 - user not found
  * @returns {string} 405 - invalid input
  */
@@ -70,9 +70,9 @@ team_router.put("/", auth, controllers.updateUser);
  * @group user - Operations about user
  * @param {UserWithPass.model} user.body.required - user info to update
  * @operationId createUser
- * @produces text/plain
+ * @produces application/json
  * @consumes application/json
- * @returns {string} 200 - ok
+ * @returns {string} 200 - ok (token)
  * @returns {string} 405 - invalid input
  */
 team_router.post("/", controllers.createUser);

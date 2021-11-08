@@ -1,7 +1,11 @@
 import pg from "pg";
 const { Pool } = pg;
 
-import { AuthService, TeamsService, PlayersService, UsersService } from "../logic/logic_facade.js";
+import AuthService from "../logic/services/auth_service.js";
+import TeamsService from "../logic/services/teams_service.js";
+import UsersService from "../logic/services/users_service.js";
+import PlayersService from "../logic/services/players_service.js";
+
 import PgPlayersRepo from "../db/players_repo.js";
 import PgTeamsRepo from "../db/teams_repo.js";
 import PgUsersRepo from "../db/users_repo.js";

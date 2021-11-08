@@ -49,8 +49,8 @@ const createUser = (req, res, _next) => {
     safetyWrapper(res, async () => {
         const user = (new DTOUserWithPass(req.body)).toUser();
         const id = await usersService.addUser(user);
-        // TODO: Наверное, здесь надо сгенерить токен?!
-        res.status(200).send('');
+        const token = await authService.generateToken(user);
+        res.status(200).json(token);
     });
 };
 
