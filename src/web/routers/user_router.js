@@ -1,9 +1,12 @@
 "use strict";
 
-const controllers = require("../controllers/user_controllers");
+import express from "express";
 
-const express = require("express");
-const router = express.Router();
+import controllers from "../controllers/user_controllers.js";
+import common_controllers from "../controllers/common_controllers.js";
+const { auth } = common_controllers;
+
+const team_router = express.Router();
 
 /**
  * Login into system
@@ -13,12 +16,11 @@ const router = express.Router();
  * @operationId loginUser
  * @produces application/json
  * @consumes application/json
- * @returns {User.model} 200 - ok
- * @headers {string} 200.Set-Cookie - `jwtToken` cookie to remember JWT token
+ * @returns {string} 200 - ok
  * @returns {string} 404 - user not found
  * @returns {string} 405 - invalid input
  */
-router.post("/login", controllers.login);
+team_router.post("/login", controllers.login);
 
 /**
  * Logout from system
@@ -31,7 +33,7 @@ router.post("/login", controllers.login);
  * @returns {string} 405 - invalid input
  * @security JWT
  */
-router.post("/logout", controllers.logout);
+team_router.post("/logout", auth, controllers.logout);
 
 /**
  * Get user by username
@@ -45,7 +47,7 @@ router.post("/logout", controllers.logout);
  * @returns {string} 404 - user not found
  * @returns {string} 405 - invalid input
  */
-router.get("/:username", controllers.getByUsername);
+team_router.get("/:username", controllers.getByUsername);
 
 /**
  * Update user (can be perfomed only by user himself)
@@ -60,7 +62,7 @@ router.get("/:username", controllers.getByUsername);
  * @returns {string} 405 - invalid input
  * @security JWT
  */
-router.put("/", controllers.updateUser);
+team_router.put("/", auth, controllers.updateUser);
 
 /**
  * Create new user
@@ -73,6 +75,6 @@ router.put("/", controllers.updateUser);
  * @returns {string} 200 - ok
  * @returns {string} 405 - invalid input
  */
-router.post("/", controllers.createUser);
+team_router.post("/", controllers.createUser);
 
-module.exports = router;
+export default team_router;

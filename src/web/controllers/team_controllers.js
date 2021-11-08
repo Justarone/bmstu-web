@@ -1,11 +1,11 @@
 "use strict";
 
-const { playersService, teamsService } = require("../init");
-const { InvalidArgumentError } = require("../../logic/error");
-const { DTOTeam } = require("../models");
-const { safetyWrapper } = require("../common");
+import { playersService, teamsService } from "../init.js";
+import { InvalidArgumentError } from "../../logic/error.js";
+import { DTOTeam } from "../models.js";
+import { safetyWrapper } from "../common.js";
 
-module.exports.addPlayerToTeam = (req, res, _next) => {
+const addPlayerToTeam = (req, res, _next) => {
     console.log("addPlayerToTeam");
     safetyWrapper(res, async () => {
         const playerId = res.body && parseInt(res.body);
@@ -16,7 +16,7 @@ module.exports.addPlayerToTeam = (req, res, _next) => {
     });
 };
 
-module.exports.getAllPlayersFromTeam = (_req, res, _next) => {
+const getAllPlayersFromTeam = (req, res, _next) => {
     console.log("getAllPlayersFromTeam");
     safetyWrapper(res, async () => {
         const teamId = req.params.teamId && parseInt(req.params.teamId);
@@ -27,7 +27,7 @@ module.exports.getAllPlayersFromTeam = (_req, res, _next) => {
     });
 };
 
-module.exports.getTeam = (_req, res, _next) => {
+const getTeam = (req, res, _next) => {
     console.log("getTeam");
     safetyWrapper(res, async () => {
         const teamId = req.params.teamId && parseInt(req.params.teamId);
@@ -40,30 +40,33 @@ module.exports.getTeam = (_req, res, _next) => {
     });
 };
 
-module.exports.updateTeamName = (_req, res, _next) => {
+const updateTeamName = (req, res, _next) => {
     console.log("updateTeamName");
     safetyWrapper(res, async () => {
         const teamId = req.params.teamId && parseInt(req.params.teamId);
         if (!teamId)
             throw new InvalidArgumentError("Can't parse team ID");
         const newName = req.body;
+        // FIXME: change this
         const ownerId = req.user.id || 1;
         await teamsService.updateTeamName(teamId, newName);
         res.status(200).send("ok");
     });
 };
 
-module.exports.deleteTeam = (_req, res, _next) => {
+const deleteTeam = (_req, res, _next) => {
     console.log("deleteTeam");
     res.status(200).send("ok");
 };
 
-module.exports.getAllTeams = (_req, res, _next) => {
+const getAllTeams = (_req, res, _next) => {
     console.log("getAllTeams");
     res.status(200).send(JSON.stringify([defaultTeam, defaultTeam]));
 };
 
-module.exports.addNewTeam = (_req, res, _next) => {
+const addNewTeam = (_req, res, _next) => {
     console.log("addNewTeam");
     res.status(200).send("ok");
 };
+
+export default { addPlayerToTeam, getAllPlayersFromTeam, getTeam, updateTeamName, deleteTeam, getAllTeams, addNewTeam };

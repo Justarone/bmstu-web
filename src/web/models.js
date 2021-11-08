@@ -1,6 +1,6 @@
-const { User, Team, Player } = require("../logic/models");
+import { User, Team, Player } from "../logic/models.js";
 
-correctDate = date => {
+const correctDate = date => {
     if (typeof(date) === "string")
         date = new Date(date);
 
@@ -10,7 +10,7 @@ correctDate = date => {
     return date;
 }
 
-exports.DTOUser = class DTOUser {
+class DTOUser {
     constructor(obj) {
         this.id = obj.id;
         this.login = obj.login;
@@ -22,7 +22,7 @@ exports.DTOUser = class DTOUser {
     }
 };
 
-exports.DTOUserWithPass = class DTOUserWithPass {
+class DTOUserWithPass {
     constructor(obj) {
         this.id = obj.id;
         this.login = obj.login;
@@ -35,14 +35,14 @@ exports.DTOUserWithPass = class DTOUserWithPass {
     }
 };
 
-exports.DTOUserLoginInfo = class DTOUserLoginInfo {
+class DTOUserLoginInfo {
     constructor(obj) {
         this.login = obj.login;
         this.password = obj.password;
     }
 };
 
-exports.DTOPlayer = class DTOPlayer {
+class DTOPlayer {
     constructor(obj) {
         this.id = obj.id;
         this.fname = obj.fname;
@@ -56,7 +56,7 @@ exports.DTOPlayer = class DTOPlayer {
     }
 };
 
-exports.DTOTeam = class DTOTeam {
+class DTOTeam {
     constructor(obj) {
         this.id = obj.id;
         this.ownerId = obj.ownerId;
@@ -68,10 +68,12 @@ exports.DTOTeam = class DTOTeam {
     }
 };
 
-exports.DTOPlayerUpdInfo = class DTOPlayerUpdInfo {
+class DTOPlayerUpdInfo {
     constructor(obj) {
         this.fname = obj.fname;
         this.lname = obj.lname;
         this.cntry = obj.cntry;
     }
 }
+
+export { DTOPlayer, DTOTeam, DTOUser, DTOUserLoginInfo, DTOUserWithPass, DTOPlayerUpdInfo };

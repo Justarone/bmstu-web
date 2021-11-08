@@ -1,9 +1,10 @@
-const { AuthService, TeamsService, PlayersService, UsersService } = require("../logic/logic_facade");
-const { Pool } = require("pg");
+import pg from "pg";
+const { Pool } = pg;
 
-const { PgPlayersRepo } = require("../db/players_repo");
-const { PgTeamsRepo } = require("../db/teams_repo");
-const { PgUsersRepo } = require("../db/users_repo");
+import { AuthService, TeamsService, PlayersService, UsersService } from "../logic/logic_facade.js";
+import PgPlayersRepo from "../db/players_repo.js";
+import PgTeamsRepo from "../db/teams_repo.js";
+import PgUsersRepo from "../db/users_repo.js";
 
 const USERNAME = "justarone";
 const HOST = "localhost";
@@ -25,7 +26,9 @@ const playersRepo = new PgPlayersRepo(pool);
 const teamsRepo = new PgTeamsRepo(pool);
 const usersRepo = new PgUsersRepo(pool);
 
-module.exports.usersService = new UsersService(usersRepo);
-module.exports.authService = new AuthService(usersRepo);
-module.exports.teamsService = new TeamsService(teamsRepo);
-module.exports.playersService = new PlayersService(playersRepo);
+const usersService = new UsersService(usersRepo);
+const authService = new AuthService(usersRepo);
+const teamsService = new TeamsService(teamsRepo);
+const playersService = new PlayersService(playersRepo);
+
+export { usersService, authService, teamsService, playersService };

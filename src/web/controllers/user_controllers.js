@@ -1,11 +1,11 @@
 "use strict";
 
-const { authService, usersService } = require("../init");
-const { NotFoundError, InvalidArgumentError } = require("../../logic/error");
-const { DTOUserLoginInfo, DTOUser, DTOUserWithPass } = require("../models");
-const { safetyWrapper } = require("../common");
+import { authService, usersService } from "../init.js";
+import { NotFoundError, InvalidArgumentError } from "../../logic/error.js";
+import { DTOUserLoginInfo, DTOUser, DTOUserWithPass } from "../models.js";
+import { safetyWrapper } from "../common.js";
 
-module.exports.login = (req, res, _next) => {
+const login = (req, res, _next) => {
     console.log("login");
     safetyWrapper(res, async () => {
         const { login, password } = new DTOUserLoginInfo(req.body);
@@ -15,7 +15,7 @@ module.exports.login = (req, res, _next) => {
     });
 };
 
-module.exports.logout = (_req, res, _next) => {
+const logout = (_req, res, _next) => {
     console.log("logout");
     safetyWrapper(res, async () => {
         await authService.logout();
@@ -24,7 +24,7 @@ module.exports.logout = (_req, res, _next) => {
     });
 };
 
-module.exports.getByUsername = (req, res, _next) => {
+const getByUsername = (req, res, _next) => {
     console.log("getByUsername");
     safetyWrapper(res, async () => {
         if (!req.params.username)
@@ -36,7 +36,7 @@ module.exports.getByUsername = (req, res, _next) => {
     });
 };
 
-module.exports.updateUser = (req, res, _next) => {
+const updateUser = (req, res, _next) => {
     console.log("updateUser");
     safetyWrapper(res, async () => {
         const user = (new DTOUserWithPass(req.body)).toUser();
@@ -45,7 +45,7 @@ module.exports.updateUser = (req, res, _next) => {
     });
 };
 
-module.exports.createUser = (req, res, _next) => {
+const createUser = (req, res, _next) => {
     console.log("createUser");
     safetyWrapper(res, async () => {
         const user = (new DTOUserWithPass(req.body)).toUser();
@@ -54,3 +54,5 @@ module.exports.createUser = (req, res, _next) => {
         res.status(200).send('');
     });
 };
+
+export default { login, logout, getByUsername, updateUser, createUser };

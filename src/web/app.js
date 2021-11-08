@@ -1,21 +1,22 @@
-const express = require("express");
-const path = require("path");
-const body_parser = require("body-parser");
-const swaggerUi = require('swagger-ui-express');
-const YAML = require('yamljs');
-const cookieParser = require("cookie-parser");
+import express from "express";
+import path from "path";
+import body_parser from "body-parser";
+import swaggerUi from 'swagger-ui-express';
+import YAML from 'yamljs';
+import cookieParser from "cookie-parser";
 
-const common_controllers = require("./controllers/common_controllers");
-const api_router = require("./routers/api_router");
+import common_controllers from "./controllers/common_controllers.js";
+import api_router from "./routers/api_router.js";
 
-const { options } = require("./swagger-options");
+import options from "./swagger-options.js";
 
 const PAGES_FOLDER = "public";
 
 const port = process.env.PORT | 3000;
 
 const app = express();
-const expressSwagger = require("express-swagger-generator")(app);
+import expressSwaggerGenerator from "express-swagger-generator";
+const expressSwagger = expressSwaggerGenerator(app);
 expressSwagger(options);
 
 const swaggerDocument = YAML.load('./swagger.yaml');
@@ -31,7 +32,7 @@ app.use(body_parser.json());
 app.use(body_parser.urlencoded({ extended: true }));
 app.use("/api", api_router)
 
-app.use(express.static(path.join(__dirname, "..", PAGES_FOLDER)));
+app.use(express.static(path.join(path.resolve(), "..", PAGES_FOLDER)));
 
 app.listen(port);
 console.log(`Running on port ${port}`);

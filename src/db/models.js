@@ -1,12 +1,12 @@
-const { User, Team, Player } = require("../logic/models");
+import { User, Team, Player } from "../logic/models.js";
 
-correctDate = date => {
+const correctDate = date => {
     if (date.getTimezoneOffset() != 0)
         date.setTime(date.getTime() - date.getTimezoneOffset() * 60 * 1000);
     return date;
 }
 
-exports.DbUser = class DbUser {
+class DbUser {
     constructor(dbRow) {
         this.id = dbRow.id;
         this.login = dbRow.login;
@@ -19,7 +19,7 @@ exports.DbUser = class DbUser {
     }
 };
 
-exports.DbPlayer = class DbPlayer {
+class DbPlayer {
     constructor(dbRow) {
         this.id = dbRow.id;
         this.fname = dbRow.fname;
@@ -33,7 +33,7 @@ exports.DbPlayer = class DbPlayer {
     }
 };
 
-exports.DbTeam = class DbTeam {
+class DbTeam {
     constructor(dbRow) {
         this.id = dbRow.id;
         this.ownerId = dbRow.ownerId;
@@ -44,3 +44,5 @@ exports.DbTeam = class DbTeam {
         return new Team(this.id, this.ownerId, this.name);
     }
 };
+
+export { DbTeam, DbUser, DbPlayer };

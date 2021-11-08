@@ -1,34 +1,35 @@
-const { User } = require("./models");
-const { PermissionError, NotFoundError, LogicError } = require("./error");
-const jwt = require("jsonwebtoken");
-const sha256 = require("js-sha256");
+import jwt from "jsonwebtoken";
+import sha256 from "js-sha256";
+
+import { PermissionError, NotFoundError } from "./error.js";
 
 const ADMIN_LEVEL = 1;
 const SECRET = "my_secret";
 
 const isAdmin = user => user.plevel === ADMIN_LEVEL;
-
-const verifyPromo = promo => promo === "admin";
-
-const validateUserId = id => {
-    if (!id || !goodUserId(id))
-        throw new LogicError("Bad user id (null or can't be verified)");
-}
-
 const mapPassword = password => sha256(password);
 
-const validateLoginPassword = (login, password) => {
-    if (login.length < 3 || login.length > 20)
-        throw new LogicError(`login length must be between 3 and 20`)
-    if (password.length < 4 && password.length > 20)
-        throw new LogicError(`password length must be between 4 and 20`);
-}
+// TODO: make services folder!!!
 
-const goodUserId = id => id > 0;
+//const verifyPromo = promo => promo === "admin";
+
+//const validateUserId = id => {
+    //if (!id || !goodUserId(id))
+        //throw new LogicError("Bad user id (null or can't be verified)");
+//}
+
+//const validateLoginPassword = (login, password) => {
+    //if (login.length < 3 || login.length > 20)
+        //throw new LogicError(`login length must be between 3 and 20`)
+    //if (password.length < 4 && password.length > 20)
+        //throw new LogicError(`password length must be between 4 and 20`);
+//}
+
+//const goodUserId = id => id > 0;
 
 // =============================================================================
 
-module.exports.UsersService = class UsersService {
+class UsersService {
     constructor(usersRepo) {
         this.usersRepo = usersRepo;
     }
@@ -49,20 +50,20 @@ module.exports.UsersService = class UsersService {
     }
 };
 
-module.exports.PlayersService = class PlayersService {
+class PlayersService {
     constructor(playersRepo) {
         this.playersRepo = playersRepo;
     }
 
     async addPlayer(player, requester) {
-        if (requester.plevel != ADMIN_LEVEL)
+        if (!isAdmin(requester))
             throw new PermissionError("No enough rights");
         return this.playersRepo.addPlayer(player);
     }
 
     async removePlayer(playerId, requester) {
         console.log(JSON.stringify(requester));
-        if (requester.plevel != ADMIN_LEVEL)
+        if (!isAdmin(requester))
             throw new PermissionError("No enough rights");
         await this.playersRepo.delPlayer(playerId);
     }
@@ -80,7 +81,7 @@ module.exports.PlayersService = class PlayersService {
     }
 
     async updatePlayer(player, requester) {
-        if (requester.plevel != ADMIN_LEVEL)
+        if (!isAdmin(requester))
             throw new PermissionError("No enough rights");
         await this.playersRepo.updatePlayer(player);
     }
@@ -105,7 +106,7 @@ module.exports.PlayersService = class PlayersService {
     }
 }
 
-module.exports.TeamsService = class TeamsService {
+class TeamsService {
     constructor(teamsRepo) {
         this.teamsRepo = teamsRepo;
     }
@@ -140,7 +141,7 @@ module.exports.TeamsService = class TeamsService {
 }
 
 
-module.exports.AuthService = class AuthService {
+class AuthService {
     constructor(usersRepo) {
         this.usersRepo = usersRepo;
     }
@@ -173,11 +174,12 @@ module.exports.AuthService = class AuthService {
     async extractToken(req) {
         if (req.headers.authorization && req.headers.authorization.split(' ')[0] === 'Bearer')
             return req.headers.authorization.split(' ')[1];
+        // NOTE: should I?..
         else if (req.cookies.jwtToken)
             return req.cookies.jwtToken;
         else if (req.params && req.params.token)
             return req.params.token;
-        throw new PermissionError("Can't find token");
+        throw new PermissionError("Credentials weren't provided");
     }
 
     async extractInfoFromToken(token) {
@@ -188,13 +190,15 @@ module.exports.AuthService = class AuthService {
         // maybe add to blacklist or something like that?
     }
 
+    // Deprecated
     async resetHeader(res) {
         res.clearCookie("jwtToken");
     }
 
+    // Deprecated
     async setHeader(res, token) {
         res.cookie("jwtToken", `${token}`);
     }
 }
 
-
+export { AuthService, TeamsService, PlayersService, UsersService };

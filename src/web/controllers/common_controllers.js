@@ -1,25 +1,26 @@
 "use strict";
 
-const { authService } = require("../init");
-const { safetyWrapper } = require("../common");
+import { authService } from "../init.js";
+import { safetyWrapper } from "../common.js";
 
-module.exports.default_controller = (_, res) => res.sendFile(PATH_TO_MAIN_PAGE);
+const default_controller = (_, res) => res.sendFile(PATH_TO_MAIN_PAGE);
 
-module.exports.set_headers = (_, res, next) => {
+
+const set_headers = (_, res, next) => {
     res.header("Cache-Control", "no-cache, no-store, must-revalidate");
     res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
     res.header("Access-Control-Allow-Origin", "*");
     next();
 }
 
-module.exports.logger = (req, _, next) => {
+const logger = (req, _, next) => {
     console.log(req.url, req.method);
     console.log(`body:\n${JSON.stringify(req.body, null, 4)}`);
     console.log(`query params:\n${JSON.stringify(req.query, null, 4)}`);
     next();
 }
 
-module.exports.auth = (req, res, next) => {
+const auth = (req, res, next) => {
     console.log("auth layer reached");
     safetyWrapper(res, async () => {
         try {
@@ -36,3 +37,5 @@ module.exports.auth = (req, res, next) => {
         }
     });
 }
+
+export default { default_controller, auth, logger, set_headers };

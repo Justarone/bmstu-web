@@ -1,4 +1,4 @@
-exports.AbstractPlayersRepo = class AbstractPlayersRepo {
+const AbstractPlayersRepo = class AbstractPlayersRepo {
     async delPlayer(_playerId) {}
     async addPlayer(_player) {}
     async updatePlayer(_player) {}
@@ -8,7 +8,7 @@ exports.AbstractPlayersRepo = class AbstractPlayersRepo {
     async addPlayerToTeam(_playerId, _teamId) {}
 };
 
-exports.AbstractUserRepo = class AbstractUserRepo {
+const AbstractUserRepo = class AbstractUserRepo {
     async getUser(_id) {}
     async getUserByUsername(_username) {}
     async addUser(_user) {}
@@ -16,10 +16,12 @@ exports.AbstractUserRepo = class AbstractUserRepo {
     async updateUser(_user) {}
 }
 
-exports.AbstractTeamsRepo = class AbstractTeamsRepo {
+const AbstractTeamsRepo = class AbstractTeamsRepo {
     async addTeam(_team) {}
     async updateTeam(_team) {}
     async getTeams() {}
     async getUserTeams(_userId) {}
     async delTeam(_teamId) {}
 };
+
+export { AbstractTeamsRepo, AbstractUserRepo, AbstractPlayersRepo };

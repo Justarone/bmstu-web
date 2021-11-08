@@ -1,8 +1,9 @@
-const {  DbUser } = require("../db/models");
-const { build_update_list, performQuery, performUpdate, performInsert, performDelete, USERS_TABLE } = require("./common");
-const { AbstractUserRepo } = require("../logic/db_interface");
+import {  DbUser } from "../db/models.js";
+import { build_update_list, performQuery, performUpdate, performInsert, performDelete, USERS_TABLE } from "./common.js";
+import { AbstractUserRepo } from "../logic/db_interface.js";
+import { DbError } from "../logic/error.js";
 
-exports.PgUsersRepo = class PgUsersRepo extends AbstractUserRepo {
+const PgUsersRepo = class PgUsersRepo extends AbstractUserRepo {
     constructor(conn) {
         super();
         this.conn = conn;
@@ -44,3 +45,5 @@ exports.PgUsersRepo = class PgUsersRepo extends AbstractUserRepo {
         await performDelete(query, this.conn);
     }
 }
+
+export default PgUsersRepo;

@@ -1,10 +1,12 @@
 "use strict";
 
-const controllers = require("../controllers/player_controllers");
-const { auth } = require("../controllers/common_controllers");
+import express from "express";
 
-const express = require("express");
-const router = express.Router();
+import controllers from "../controllers/player_controllers.js";
+import common_controllers from "../controllers/common_controllers.js";
+const { auth } = common_controllers;
+
+const player_router = express.Router();
 
 /**
  * Get player by id
@@ -15,8 +17,9 @@ const router = express.Router();
  * @produces application/json
  * @consumes application/json
  * @returns {Player.model} 200 - player with requested id
+ * @returns {string} 404 - player was not found
  */
-router.get("/:playerId", controllers.getPlayer);
+player_router.get("/:playerId", controllers.getPlayer);
 
 /**
  * Update player with specified id
@@ -31,7 +34,7 @@ router.get("/:playerId", controllers.getPlayer);
  * @returns {string} 404 - not found
  * @security JWT
  */
-router.patch("/:playerId", auth, controllers.modifyPlayer);
+player_router.patch("/:playerId", auth, controllers.modifyPlayer);
 
 /**
  * Delete player with specified id
@@ -45,7 +48,7 @@ router.patch("/:playerId", auth, controllers.modifyPlayer);
  * @returns {string} 405 - invalid input
  * @security JWT
  */
-router.delete("/:playerId", auth, controllers.deletePlayer);
+player_router.delete("/:playerId", auth, controllers.deletePlayer);
 
 /**
  * Get all players collection
@@ -55,14 +58,13 @@ router.delete("/:playerId", auth, controllers.deletePlayer);
  * @produces application/json
  * @returns {Array.<Player.model>} 200 - An array of players info
  */
-router.get("/", controllers.getAllPlayers);
+player_router.get("/", controllers.getAllPlayers);
 
 /**
  * Create new player in database
  * @route POST /player
- * @param {integer} playerId.path.required - player id to get
  * @group player - Operations about player
- * @param {Player.model} player.body.required - player info to update
+ * @param {Player.model} player.body.required - player to add
  * @operationId createPlayer
  * @produces text/plain
  * @consumes application/json
@@ -71,6 +73,6 @@ router.get("/", controllers.getAllPlayers);
  * @returns {string} 405 - invalid input
  * @security JWT
  */
-router.post("/", auth, controllers.postPlayer);
+player_router.post("/", auth, controllers.postPlayer);
 
-module.exports = router;
+export default player_router;

@@ -1,9 +1,9 @@
-const { performQuery, performUpdate, performInsert, performDelete, build_update_list, PLAYERS_TABLE, correctDate } = require("./common");
-const { AbstractPlayersRepo } = require("../logic/db_interface");
-const { DbPlayer } = require("../db/models");
-const { NotFoundError, DbError, PermissionError } = require("../logic/error");
+import { performQuery, performUpdate, performInsert, performDelete, build_update_list, PLAYERS_TABLE } from "./common.js";
+import { AbstractPlayersRepo } from "../logic/db_interface.js";
+import { DbPlayer } from "../db/models.js";
+import { DbError } from "../logic/error.js";
 
-exports.PgPlayersRepo = class PgPlayersRepo extends AbstractPlayersRepo {
+const PgPlayersRepo = class PgPlayersRepo extends AbstractPlayersRepo {
     constructor(conn) {
         super();
         this.conn = conn;
@@ -11,7 +11,7 @@ exports.PgPlayersRepo = class PgPlayersRepo extends AbstractPlayersRepo {
 
     async delPlayer(playerId) {
         const query = `DELETE FROM ${PLAYERS_TABLE} WHERE id = ${playerId}`;
-        const res = await performDelete(query, this.conn);
+        await performDelete(query, this.conn);
     }
 
     async addPlayer(player) {
@@ -66,3 +66,5 @@ exports.PgPlayersRepo = class PgPlayersRepo extends AbstractPlayersRepo {
             : null;
     }
 }
+
+export default PgPlayersRepo;

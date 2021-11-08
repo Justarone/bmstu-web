@@ -4,18 +4,18 @@
 // players: fname, lname, entry, dob
 // teamplayer: team_id, player_id
 
-const { Pool } = require("pg");
-const { AbstractDbFacade } = require("../logic/db_interface");
-const { NotFoundError, BaseError, PermissionError, DbError } = require("../logic/error");
+import pg from "pg";
+const { Pool } = pg;
+
+import { NotFoundError, BaseError, PermissionError, DbError } from "../logic/error.js";
 
 // COMMON FUNCTIONS
 
-exports.USERS_TABLE = "users";
-exports.TEAMS_TABLE = "teams";
-exports.PLAYERS_TABLE = "players";
-exports.TEAM_PLAYER_TABLE = "teamplayer";
+const USERS_TABLE = "users";
+const TEAMS_TABLE = "teams";
+const PLAYERS_TABLE = "players";
 
-exports.build_connect = (params) => {
+const build_connect = (params) => {
     return new Pool(params);
 } 
 
@@ -26,9 +26,8 @@ const performQuery = async (queryString, conn) => {
         throw new DbError(`Failed to query postgres (reason: ${err})`);
     }
 }
-exports.performQuery = performQuery;
 
-exports.performInsert = async (queryString, conn) => {
+const performInsert = async (queryString, conn) => {
     try {
         const res = await performQuery(queryString, conn);
         if (!res)
@@ -45,7 +44,7 @@ exports.performInsert = async (queryString, conn) => {
     }
 }
 
-exports.performDelete = async (queryString, conn) => {
+const performDelete = async (queryString, conn) => {
     try {
         const res = await performQuery(queryString, conn);
         if (!res)
@@ -62,7 +61,7 @@ exports.performDelete = async (queryString, conn) => {
     }
 }
 
-exports.performUpdate = async (queryString, conn) => {
+const performUpdate = async (queryString, conn) => {
     try {
         const res = await performQuery(queryString, conn);
         if (!res)
@@ -79,13 +78,13 @@ exports.performUpdate = async (queryString, conn) => {
     }
 }
 
-const convertResponse = (resp, msg) => {
-    if (!resp)
-        throw new DbError(msg);
-    return resp;
-}
+//const convertResponse = (resp, msg) => {
+    //if (!resp)
+        //throw new DbError(msg);
+    //return resp;
+//}
 
-exports.build_update_list = obj => {
+const build_update_list = obj => {
     let update_list = '';
     for (const k in obj) {
         if (k == 'id')
@@ -95,3 +94,6 @@ exports.build_update_list = obj => {
     }
     return update_list.substring(0, update_list.length - 1);
 }
+
+export { performQuery, USERS_TABLE, PLAYERS_TABLE, TEAMS_TABLE, build_update_list, build_connect, performUpdate,
+    performInsert, performDelete };

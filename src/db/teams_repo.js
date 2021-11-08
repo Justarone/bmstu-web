@@ -1,8 +1,9 @@
-const { build_update_list, performQuery, performDelete, performUpdate, performInsert, TEAMS_TABLE } = require("./common");
-const { AbstractTeamsRepo } = require("../logic/db_interface");
-const {  DbTeam } = require("../db/models");
+import { build_update_list, performQuery, performDelete, performUpdate, performInsert, TEAMS_TABLE } from "./common.js";
+import { AbstractTeamsRepo } from "../logic/db_interface.js";
+import { DbTeam } from "../db/models.js";
+import { DbError } from "../logic/error.js";
 
-exports.PgTeamsRepo = class PgTeamsRepo extends AbstractTeamsRepo {
+const PgTeamsRepo = class PgTeamsRepo extends AbstractTeamsRepo {
     constructor(conn) {
         super();
         this.conn = conn;
@@ -44,3 +45,5 @@ exports.PgTeamsRepo = class PgTeamsRepo extends AbstractTeamsRepo {
         return res.rows.map(t => (new DbTeam(t)).toTeam());
     }
 }
+
+export default PgTeamsRepo;

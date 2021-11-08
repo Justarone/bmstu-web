@@ -1,6 +1,6 @@
-const { NotFoundError, PermissionError, InvalidArgumentError, DbError, LogicError } = require("../logic/error");
+import { NotFoundError, PermissionError, InvalidArgumentError, DbError, LogicError } from "../logic/error.js";
 
-module.exports.safetyWrapper = (res, f) => {
+const safetyWrapper = (res, f) => {
     f().catch(e => {
         if (e instanceof NotFoundError)
             res.status(404).send(e.msg);
@@ -18,3 +18,5 @@ module.exports.safetyWrapper = (res, f) => {
         }
     })
 }
+
+export { safetyWrapper };

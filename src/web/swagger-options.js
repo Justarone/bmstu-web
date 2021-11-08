@@ -1,4 +1,6 @@
-exports.options = {
+import path from "path";
+
+const options = {
     swaggerDefinition: {
         info: {
             description: 'Hockey teams application',
@@ -13,13 +15,14 @@ exports.options = {
         schemes: ['http', 'https'],
         securityDefinitions: {
             JWT: {
-                type: 'apiKey',
-                in: 'header',
-                name: 'Authorization',
+                type: 'http',
+                scheme: 'bearer',
                 description: "",
             }
         }
     },
-    basedir: __dirname, //app absolute path
+    basedir: path.resolve('src/web'), //app absolute path
     files: ['./routers/*.js'] //Path to the API handle folder
 };
+
+export default options;
