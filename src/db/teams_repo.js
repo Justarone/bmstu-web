@@ -1,7 +1,7 @@
 import { build_update_list, performQuery, performDelete, performUpdate, performInsert, TEAMS_TABLE } from "./common.js";
 import { AbstractTeamsRepo } from "../logic/db_interface.js";
 import { DbTeam } from "../db/models.js";
-import { DbError } from "../logic/error.js";
+import { InvalidArgumentError, DbError } from "../logic/error.js";
 
 const PgTeamsRepo = class PgTeamsRepo extends AbstractTeamsRepo {
     constructor(conn) {
@@ -10,8 +10,8 @@ const PgTeamsRepo = class PgTeamsRepo extends AbstractTeamsRepo {
     }
 
     async addTeam(team) {
-        const id_query = `SELECT nextval('${USERS_TABLE + '_id_seq'}') as id;`;
-        const id_query_res = await performQuery(id_query, conn);
+        const id_query = `SELECT nextval('${TEAMS_TABLE + '_id_seq'}') as id;`;
+        const id_query_res = await performQuery(id_query, this.conn);
         if (!id_query_res || id_query_res.rows.length === 0)
             throw new DbError("Something went wrong with id fetching");
 

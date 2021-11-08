@@ -14,6 +14,7 @@ import { NotFoundError, BaseError, PermissionError, DbError } from "../logic/err
 const USERS_TABLE = "users";
 const TEAMS_TABLE = "teams";
 const PLAYERS_TABLE = "players";
+const TEAM_PLAYER_TABLE = "teamplayer";
 
 const build_connect = (params) => {
     return new Pool(params);
@@ -96,4 +97,4 @@ const build_update_list = obj => {
 }
 
 export { performQuery, USERS_TABLE, PLAYERS_TABLE, TEAMS_TABLE, build_update_list, build_connect, performUpdate,
-    performInsert, performDelete };
+    performInsert, performDelete, TEAM_PLAYER_TABLE };

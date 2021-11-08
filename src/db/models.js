@@ -36,7 +36,7 @@ class DbPlayer {
 class DbTeam {
     constructor(dbRow) {
         this.id = dbRow.id;
-        this.ownerId = dbRow.ownerId;
+        this.ownerId = dbRow.owner_id;
         this.name = dbRow.name;
     }
 

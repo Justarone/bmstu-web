@@ -62,7 +62,6 @@ class PlayersService {
     }
 
     async removePlayer(playerId, requester) {
-        console.log(JSON.stringify(requester));
         if (!isAdmin(requester))
             throw new PermissionError("No enough rights");
         await this.playersRepo.delPlayer(playerId);
@@ -115,7 +114,9 @@ class TeamsService {
         return this.teamsRepo.getTeams();
     }
 
-    async addTeam(team) {
+    async addTeam(team, requester) {
+        if (team.ownerId != requester.id)
+            throw new PermissionError("Can't add team for another user");
         await this.teamsRepo.addTeam(team);
     }
 
@@ -127,11 +128,17 @@ class TeamsService {
         return res;
     }
 
-    async removeTeam(teamId) {
+    async deleteTeam(teamId, requester) {
+        const dbTeam = await this.getTeamById(teamId);
+        if (dbTeam.ownerId != requester.id)
+            throw new PermissionError("Can't change others' teams");
         await this.teamsRepo.delTeam(teamId);
     }
 
-    async updateTeam(team) {
+    async updateTeam(team, requester) {
+        const dbTeam = await this.getTeamById(team.id);
+        if (dbTeam.ownerId != requester.id)
+            throw new PermissionError("Can't change others' teams");
         await this.teamsRepo.updateTeam(team);
     }
 
@@ -158,7 +165,7 @@ class AuthService {
     }
 
     generateToken(user) {
-        return jwt.sign({
+        return "Bearer " + jwt.sign({
           data: JSON.stringify(user)
         }, SECRET, { expiresIn: '1h' });
     }

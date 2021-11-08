@@ -10,8 +10,7 @@ const login = (req, res, _next) => {
     safetyWrapper(res, async () => {
         const { login, password } = new DTOUserLoginInfo(req.body);
         const token = await authService.login(login, password);
-        await authService.setHeader(res, token);
-        res.status(200).send("ok");
+        res.status(200).json(token);
     });
 };
 
@@ -27,12 +26,12 @@ const logout = (_req, res, _next) => {
 const getByUsername = (req, res, _next) => {
     console.log("getByUsername");
     safetyWrapper(res, async () => {
-        if (!req.params.username)
+        if (!req.query.username)
             throw new InvalidArgumentError("username not found");
-        const user = await usersService.getUserByUsername(req.params.username);
+        const user = await usersService.getUserByUsername(req.query.username);
         if (!user)
             throw new NotFoundError("user not found by username");
-        res.status(200).json(user);
+        res.status(200).json(new DTOUser(user));
     });
 };
 

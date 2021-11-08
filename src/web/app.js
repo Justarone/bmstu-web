@@ -23,13 +23,15 @@ const swaggerDocument = YAML.load('./swagger.yaml');
 
 app.use('/api-man-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
-app.use(common_controllers.logger);
 // заголовки в ответ клиенту
 app.use(common_controllers.set_headers);
 app.use(cookieParser())
 
+app.use(body_parser.text());
 app.use(body_parser.json());
 app.use(body_parser.urlencoded({ extended: true }));
+app.use(common_controllers.logger);
+
 app.use("/api", api_router)
 
 app.use(express.static(path.join(path.resolve(), "..", PAGES_FOLDER)));

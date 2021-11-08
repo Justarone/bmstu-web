@@ -3,15 +3,41 @@
 import { playersService, teamsService } from "../init.js";
 import { InvalidArgumentError } from "../../logic/error.js";
 import { DTOTeam } from "../models.js";
+import { Team } from "../../logic/models.js";
 import { safetyWrapper } from "../common.js";
 
 const addPlayerToTeam = (req, res, _next) => {
     console.log("addPlayerToTeam");
     safetyWrapper(res, async () => {
-        const playerId = res.body && parseInt(res.body);
+        const playerId = req.body && parseInt(req.body);
         if (!playerId)
             throw new InvalidArgumentError("Can't parse player ID in body");
-        await playersService.addPlayerToTeam(req.params.playerId, playerId);
+        const teamId = req.params.teamId && parseInt(req.params.teamId);
+        if (!teamId)
+            throw new InvalidArgumentError("Can't parse team ID");
+        // exception, if no such team or player
+        await teamsService.getTeamById(teamId);
+        await playersService.getPlayerById(playerId);
+
+        await playersService.addPlayerToTeam(teamId, playerId);
+        res.status(200).send("ok");
+    });
+};
+
+const deletePlayerFromTeam = (req, res, _next) => {
+    console.log("deletePlayerFromTeam");
+    safetyWrapper(res, async () => {
+        const playerId = req.body && parseInt(req.body);
+        if (!playerId)
+            throw new InvalidArgumentError("Can't parse player ID in body");
+        const teamId = req.params.teamId && parseInt(req.params.teamId);
+        if (!teamId)
+            throw new InvalidArgumentError("Can't parse team ID");
+        // exception, if no such team or player
+        await teamsService.getTeamById(teamId);
+        await playersService.getPlayerById(playerId);
+
+        await playersService.removePlayerFromTeam(teamId, playerId);
         res.status(200).send("ok");
     });
 };
@@ -47,26 +73,42 @@ const updateTeamName = (req, res, _next) => {
         if (!teamId)
             throw new InvalidArgumentError("Can't parse team ID");
         const newName = req.body;
-        // FIXME: change this
-        const ownerId = req.user.id || 1;
-        await teamsService.updateTeamName(teamId, newName);
+        if (!newName)
+            throw new InvalidArgumentError("Can't parse team name");
+        const team = new Team(teamId, req.user.id, newName);
+        await teamsService.updateTeam(team, req.user);
         res.status(200).send("ok");
     });
 };
 
-const deleteTeam = (_req, res, _next) => {
+const deleteTeam = (req, res, _next) => {
     console.log("deleteTeam");
-    res.status(200).send("ok");
+    safetyWrapper(res, async () => {
+        const teamId = req.params.teamId && parseInt(req.params.teamId);
+        if (!teamId)
+            throw new InvalidArgumentError("Can't parse team ID");
+        await teamsService.deleteTeam(teamId, req.user);
+        res.status(200).send("ok");
+    });
 };
 
 const getAllTeams = (_req, res, _next) => {
     console.log("getAllTeams");
-    res.status(200).send(JSON.stringify([defaultTeam, defaultTeam]));
+    safetyWrapper(res, async () => {
+        const teams = await teamsService.getTeams();
+        res.status(200).json(teams);
+    });
 };
 
-const addNewTeam = (_req, res, _next) => {
+const addNewTeam = (req, res, _next) => {
     console.log("addNewTeam");
-    res.status(200).send("ok");
+    safetyWrapper(res, async () => {
+        const team = (new DTOTeam(req.body)).toTeam();
+        if (!team)
+            throw new InvalidArgumentError("Can't parse team");
+        await teamsService.addTeam(team, req.user);
+        res.status(200).send("ok");
+    });
 };
 
-export default { addPlayerToTeam, getAllPlayersFromTeam, getTeam, updateTeamName, deleteTeam, getAllTeams, addNewTeam };
+export default { addPlayerToTeam, deletePlayerFromTeam, getAllPlayersFromTeam, getTeam, updateTeamName, deleteTeam, getAllTeams, addNewTeam };

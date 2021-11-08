@@ -1,4 +1,4 @@
-import { performQuery, performUpdate, performInsert, performDelete, build_update_list, PLAYERS_TABLE } from "./common.js";
+import { performQuery, performUpdate, performInsert, performDelete, build_update_list, TEAM_PLAYER_TABLE, PLAYERS_TABLE } from "./common.js";
 import { AbstractPlayersRepo } from "../logic/db_interface.js";
 import { DbPlayer } from "../db/models.js";
 import { DbError } from "../logic/error.js";
@@ -45,21 +45,21 @@ const PgPlayersRepo = class PgPlayersRepo extends AbstractPlayersRepo {
         return res.rows.map(p => (new DbPlayer(p)).toPlayer());
     }
 
-    async addPlayerToTeam(playerId, teamId) {
+    async addPlayerToTeam(teamId, playerId) {
         const query = `INSERT INTO ${TEAM_PLAYER_TABLE} (team_id, player_id) VALUES \
-            ('${teamId}', '${playerId}');`;
+            (${teamId}, ${playerId});`;
         await performInsert(query, this.conn);
     }
 
     async delPlayerFromTeam(teamId, playerId) {
-        const query = `DELETE FROM ${TEAM_PLAYER_TABLE} WHERE team_id = '${teamId}' AND \
-            player_id = '${playerId}';`;
+        const query = `DELETE FROM ${TEAM_PLAYER_TABLE} WHERE team_id = ${teamId} AND \
+            player_id = ${playerId};`;
         await performDelete(query, this.conn);
     }
 
     async getPlayersFromTeam(teamId) {
-        const query = `SELECT id, fname, lname, cntry, dob FROM ${TEAM_PLAYER_TABLE} WHERE team_id = ${teamId} \
-        JOIN ${PLAYERS_TABLE} p ON p.id = tp.id`;
+        const query = `SELECT id, fname, lname, cntry, dob FROM ${TEAM_PLAYER_TABLE} tp \
+        JOIN ${PLAYERS_TABLE} p ON p.id = tp.player_id WHERE team_id = ${teamId}`;
         const res = await performQuery(query, this.conn);
         return res
             ? res.rows.map(p => (new DbPlayer(p)).toPlayer())

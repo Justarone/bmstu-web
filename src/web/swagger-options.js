@@ -15,8 +15,9 @@ const options = {
         schemes: ['http', 'https'],
         securityDefinitions: {
             JWT: {
-                type: 'http',
-                scheme: 'bearer',
+                type: 'apiKey',
+                in: 'header',
+                name: 'Authorization',
                 description: "",
             }
         }

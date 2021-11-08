@@ -10,13 +10,13 @@ const team_router = express.Router();
 
 /**
  * Add player (playerId) to team (teamId)
- * @route POST /team/{teamId}
+ * @route POST /team/{teamId}/player
  * @param {integer} teamId.path.required - team id
  * @param {integer} playerId.body.required - player id to add
  * @group team - Operations about team
- * @operationId getPlayer
- * @produces application/json
- * @consumes application/json
+ * @operationId addPlayerToTeam
+ * @produces text/plain
+ * @consumes text/plain
  * @returns {string} 200 - Team with requested id
  * @returns {string} 403 - No enough rights
  * @returns {string} 404 - Team not found
@@ -24,6 +24,23 @@ const team_router = express.Router();
  * @security JWT
  */
 team_router.post("/:teamId/player", auth, controllers.addPlayerToTeam);
+
+/**
+ * Delete player from team
+ * @route DELETE /team/{teamId}/player
+ * @param {integer} teamId.path.required - team id to delete
+ * @param {integer} playerId.body.required - player id to add
+ * @group team - Operations about team
+ * @operationId deletePlayerFromTeam
+ * @produces text/plain
+ * @consumes text/plain
+ * @returns {string} 200 - Team with requested id
+ * @returns {string} 403 - No enough rights
+ * @returns {string} 404 - Team not found
+ * @returns {string} 405 - Invalid input
+ * @security JWT
+ */
+team_router.delete("/:teamId/player", auth, controllers.deletePlayerFromTeam);
 
 /**
  * Get all players from team
@@ -34,9 +51,8 @@ team_router.post("/:teamId/player", auth, controllers.addPlayerToTeam);
  * @produces application/json
  * @returns {Array.<Player.model>} 200 - An array of players info
  * @returns {string} 404 - team not found
- * @security JWT
  */
-team_router.get("/:teamId/player", auth, controllers.getAllPlayersFromTeam);
+team_router.get("/:teamId/player", controllers.getAllPlayersFromTeam);
 
 /**
  * Get team by id
@@ -53,13 +69,16 @@ team_router.get("/:teamId", controllers.getTeam);
 /**
  * Update team name
  * @route PATCH /team/{teamId}
- * @param {integer} teamId.path.required - team id to get
+ * @param {integer} teamId.path.required - team id to set name
+ * @param {string} teamName.body.required - new team name
  * @group team - Operations about team
  * @operationId updateTeamName
  * @produces text/plain
- * @consumes application/json
- * @returns {string} 200 - ok
+ * @consumes text/plain
+ * @returns {string} 200 - Ok
+ * @returns {string} 403 - No enough rights
  * @returns {string} 404 - Team not found
+ * @returns {string} 405 - Invalid input
  * @security JWT
  */
 team_router.patch("/:teamId", auth, controllers.updateTeamName);

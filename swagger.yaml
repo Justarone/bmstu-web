@@ -1,538 +1,549 @@
-swagger: "2.0"
+---
 info:
-  description: "My hockey teams application"
-  version: "1.0.0"
-  title: "Hockey teams"
-  termsOfService: "https://google.com"
-  contact:
-    email: "p_perestoronin@mail.ru"
-host: "localhost:3000"
+  description: Hockey teams application
+  title: Swagger
+  version: 1.0.0
+host: localhost:3000
 basePath: "/api"
-tags:
-- name: "player"
-  description: "Everything about players"
-  externalDocs:
-    description: "Find out more"
-    url: "https://www.nhl.com"
-- name: "team"
-  description: "may contain players and is attached to user"
-- name: "user"
-  description: "Operations about user"
+produces:
+- application/json
 schemes:
-- "https"
-- "http"
+- http
+- https
+securityDefinitions:
+  JWT:
+    type: apiKey
+    in: header
+    name: Authorization
+    description: ''
+swagger: '2.0'
 paths:
-  /player:
-    post:
-      tags:
-      - "player"
-      summary: "Add a new player to the global base of players"
-      description: ""
-      security:
-        - cookieAuth: []
-      operationId: "addPlayer"
-      consumes:
-      - "application/json"
-      produces:
-      - "application/json"
-      parameters:
-      - in: "body"
-        name: "body"
-        description: "Player object that needs to be added to global base (only for admins)"
-        required: true
-        schema:
-          $ref: "#/definitions/Player"
-      responses:
-        "200":
-          description: "Ok"
-        "403":
-          description: "No enough rights"
-        "405":
-          description: "Invalid input"
-
+  "/player/{playerId}":
     get:
+      parameters:
+      - name: playerId
+        in: path
+        description: player id to get
+        required: true
+        type: integer
+      description: Get player by id
       tags:
-      - "player"
-      summary: "Get all players from the global base of players"
-      description: ""
-      operationId: "getPlayers"
-      produces:
-      - "application/json"
+      - player
       responses:
-        "200":
-          description: "Ok"
+        '200':
+          description: player with requested id
           schema:
-            type: "array"
-            items:
-              $ref: "#/definitions/Player"
-
-
-  /player/{playerId}:
+            "$ref": "#/definitions/Player"
+        '404':
+          description: player was not found
+      operationId: getPlayer
+      produces:
+      - application/json
+      consumes:
+      - application/json
     patch:
-      tags:
-      - "player"
-      summary: "Updates a player in the global base of players (only for admins)"
-      description: ""
-      security:
-        - cookieAuth: []
-      consumes:
-      - "application/json"
-      produces:
-      - "application/json"
       parameters:
-      - name: "playerId"
-        in: "path"
-        description: "ID of player that needs to be updated"
+      - name: playerId
+        in: path
+        description: player id to get
         required: true
-        type: "integer"
-        format: "int64"
-      - name: "body"
-        in: "body"
-        description: "Updated info of the player"
+        type: integer
+      - name: player
+        in: body
+        description: player info to update
         required: true
         schema:
-          $ref: "#/definitions/PlayerUpdInfo"
-      responses:
-        "200":
-          description: "Player updated"
-        "403":
-          description: "No enough rights"
-        "405":
-          description: "Invalid input"
-    get:
+          "$ref": "#/definitions/PlayerUpdInfo"
+      description: Update player with specified id
       tags:
-      - "player"
-      summary: "Find player by ID"
-      description: "Returns a single player"
-      operationId: "getPlayerById"
-      produces:
-      - "application/json"
-      parameters:
-      - name: "playerId"
-        in: "path"
-        description: "ID of player to return"
-        required: true
-        type: "integer"
-        format: "int64"
+      - player
       responses:
-        "200":
-          description: "successful operation"
-          schema:
-            $ref: "#/definitions/Player"
-        "400":
-          description: "Invalid ID supplied"
-        "404":
-          description: "Player not found"
-
+        '200':
+          description: ok
+        '404':
+          description: not found
+      operationId: patchPlayer
+      produces:
+      - text/plain
+      consumes:
+      - application/json
+      security:
+      - JWT: []
     delete:
-      tags:
-      - "player"
-      summary: "Deletes a player"
-      description: ""
-      security:
-        - cookieAuth: []
-      operationId: "deletePlayer"
-      produces:
-      - "application/json"
       parameters:
-      - name: "playerId"
-        in: "path"
-        description: "Player id to delete"
+      - name: playerId
+        in: path
+        description: player id to delete
         required: true
-        type: "integer"
-        format: "int64"
-      responses:
-        "400":
-          description: "Invalid ID supplied"
-        "404":
-          description: "Player not found"
-
-  /team:
-    post:
+        type: integer
+      description: Delete player with specified id
       tags:
-      - "team"
-      summary: "Add a new team for user"
-      description: ""
-      operationId: "addTeam"
-      security:
-        - cookieAuth: []
-      consumes:
-      - "application/json"
-      produces:
-      - "application/json"
-      parameters:
-      - in: "body"
-        name: "body"
-        description: "Player object that needs to be added to global base (only for admins)"
-        required: true
-        schema:
-          $ref: "#/definitions/Player"
+      - player
       responses:
-        "405":
-          description: "Invalid input"
-
+        '200':
+          description: ok
+        '403':
+          description: no enough rights
+        '405':
+          description: invalid input
+      operationId: deletePlayer
+      produces:
+      - text/plain
+      security:
+      - JWT: []
+  "/player":
     get:
-      tags:
-      - "team"
-      summary: "Get all teams"
-      description: ""
-      operationId: "getTeams"
-      produces:
-      - "application/json"
-      responses:
-        "200":
-          description: "Ok"
-          schema:
-            type: "array"
-            items:
-              $ref: "#/definitions/Team"
-
-  /team/{teamId}:
-    get:
-      tags:
-      - "team"
-      summary: "Find team by ID"
-      description: "Returns a single team"
-      operationId: "getTeamById"
-      produces:
-      - "application/json"
-      parameters:
-      - name: "teamId"
-        in: "path"
-        description: "ID of team to return"
-        required: true
-        type: "integer"
-        format: "int64"
-      responses:
-        "200":
-          description: "successful operation"
-          schema:
-            $ref: "#/definitions/Player"
-        "400":
-          description: "Invalid ID supplied"
-        "404":
-          description: "Team not found"
-
-    patch:
-      tags:
-      - "team"
-      summary: "Updates team name"
-      description: ""
-      security:
-        - cookieAuth: []
-      consumes:
-      - "application/json"
-      parameters:
-      - name: "teamId"
-        in: "path"
-        description: "ID of team that needs to be updated"
-        required: true
-        type: "integer"
-        format: "int64"
-      - name: "body"
-        in: "body"
-        description: "Updated name of the team"
-        required: true
-        schema:
-          type: "string"
-      responses:
-        "200":
-          description: "Name updated"
-        "404":
-          description: "Invalid id"
-        "405":
-          description: "Invalid name"
-
-    delete:
-      tags:
-      - "team"
-      summary: "Deletes team"
-      description: ""
-      security:
-        - cookieAuth: []
-      operationId: "deleteTeam"
-      produces:
-      - "application/json"
-      parameters:
-      - name: "teamId"
-        in: "path"
-        description: "ID of team that needs to be deleted"
-        required: true
-        type: "integer"
-        format: "int64"
-      responses:
-        "200":
-          description: "Team deleted"
-        "400":
-          description: "Invalid ID supplied"
-        "403":
-          description: "No access to team"
-
-  /team/{teamId}/player:
-    patch:
-      tags:
-      - "team"
-      summary: "Add a new player to the team"
-      description: ""
-      operationId: "addPlayerToTeam"
-      security:
-        - cookieAuth: []
-      parameters:
-      - name: "teamId"
-        in: "path"
-        description: "ID of team to return"
-        required: true
-        type: "integer"
-        format: "int64"
-      - name: "playerId"
-        in: "body"
-        description: "ID of player to return"
-        required: true
-        schema:
-          type: "integer"
-          format: "int64"
-      responses:
-        "200":
-          description: "player added"
-        "404":
-          description: "teamId not found"
-        "405":
-          description: "playerId not found"
-
-    get:
-      tags:
-      - "team"
-      summary: "Get all players from the team"
-      description: ""
-      operationId: "getPlayersFromTeam"
-      produces:
-      - "application/json"
-      parameters:
-      - name: "teamId"
-        in: "path"
-        description: "ID of team to return"
-        required: true
-        type: "integer"
-        format: "int64"
-      responses:
-        "200":
-          description: "Ok"
-          schema:
-            type: "array"
-            items:
-              $ref: "#/definitions/Player"
-
-  /user:
-    post:
-      tags:
-      - "user"
-      summary: "Create user"
-      description: ""
-      operationId: "createUser"
-      produces:
-      - "application/json"
-      parameters:
-      - in: "body"
-        name: "body"
-        description: "Created user object"
-        required: true
-        schema:
-          $ref: "#/definitions/UserWithPass"
-      responses:
-        default:
-          description: "successful operation"
-
-    put:
-      tags:
-      - "user"
-      summary: "Update user"
-      description: ""
-      operationId: "updateUser"
-      security:
-        - cookieAuth: []
-      produces:
-      - "application/json"
-      parameters:
-      - in: "body"
-        name: "body"
-        description: "Created user object"
-        required: true
-        schema:
-          $ref: "#/definitions/UserWithPass"
-      responses:
-        "200":
-          description: "Ok"
-        "403":
-          description: "No enough rights"
-        "405":
-          description: "Invalid input"
-
-  /user/login:
-    post:
-      tags:
-      - "user"
-      summary: "Logs user into the system"
-      description: ""
-      operationId: "loginUser"
-      produces:
-      - "application/json"
-      parameters:
-      - name: "loginInfo"
-        in: "body"
-        description: "The user info for login"
-        required: true
-        schema:
-          $ref: "#/definitions/UserLoginInfo"
-      responses:
-        "200":
-          description: "successful operation"
-          schema:
-            type: "string"
-          headers:
-            Set-Cookie:
-              type: "string"
-        "400":
-          description: "Invalid username/password supplied"
-  /user/logout:
-    get:
-      tags:
-      - "user"
-      summary: "Logs out current logged in user session"
-      description: ""
-      security:
-        - cookieAuth: []
-      operationId: "logoutUser"
-      produces:
-      - "application/json"
       parameters: []
-      responses:
-        default:
-          description: "successful operation"
-  /user/{username}:
-    get:
+      description: Get all players collection
       tags:
-      - "user"
-      summary: "Get user by user name"
-      description: ""
-      operationId: "getUserByName"
-      produces:
-      - "application/json"
-      parameters:
-      - name: "username"
-        in: "path"
-        description: "The name that needs to be fetched."
-        required: true
-        type: "string"
+      - player
       responses:
-        "200":
-          description: "successful operation"
+        '200':
+          description: An array of players info
           schema:
-            $ref: "#/definitions/User"
-        "400":
-          description: "Invalid username supplied"
-        "404":
-          description: "User not found"
-    #delete:
-      #tags:
-      #- "user"
-      #summary: "Delete user"
-      #description: "This can only be done by the logged in user."
-      #operationId: "deleteUser"
-      #produces:
-      #- "application/json"
-      #parameters:
-      #- name: "username"
-        #in: "path"
-        #description: "The name that needs to be deleted"
-        #required: true
-        #type: "string"
-      #responses:
-        #"400":
-          #description: "Invalid username supplied"
-        #"404":
-          #description: "User not found"
-
-
+            type: array
+            items:
+              "$ref": "#/definitions/Player.model"
+      operationId: getPlayers
+      produces:
+      - application/json
+    post:
+      parameters:
+      - name: player
+        in: body
+        description: player to add
+        required: true
+        schema:
+          "$ref": "#/definitions/Player"
+      description: Create new player in database
+      tags:
+      - player
+      responses:
+        '200':
+          description: ok
+        '403':
+          description: no enough rights
+        '405':
+          description: invalid input
+      operationId: createPlayer
+      produces:
+      - text/plain
+      consumes:
+      - application/json
+      security:
+      - JWT: []
+  "/team/{teamId}/player":
+    post:
+      parameters:
+      - name: teamId
+        in: path
+        description: team id
+        required: true
+        type: integer
+      - name: playerId
+        in: body
+        description: player id to add
+        required: true
+        type: integer
+      description: Add player (playerId) to team (teamId)
+      tags:
+      - team
+      responses:
+        '200':
+          description: Team with requested id
+        '403':
+          description: No enough rights
+        '404':
+          description: Team not found
+        '405':
+          description: Invalid input
+      operationId: addPlayerToTeam
+      produces:
+      - text/plain
+      consumes:
+      - text/plain
+      security:
+      - JWT: []
+    delete:
+      parameters:
+      - name: teamId
+        in: path
+        description: team id to delete
+        required: true
+        type: integer
+      - name: playerId
+        in: body
+        description: player id to add
+        required: true
+        type: integer
+      description: Delete player from team
+      tags:
+      - team
+      responses:
+        '200':
+          description: Team with requested id
+        '403':
+          description: No enough rights
+        '404':
+          description: Team not found
+        '405':
+          description: Invalid input
+      operationId: deletePlayerFromTeam
+      produces:
+      - text/plain
+      consumes:
+      - text/plain
+      security:
+      - JWT: []
+    get:
+      parameters:
+      - name: teamId
+        in: path
+        description: team id
+        required: true
+        type: integer
+      description: Get all players from team
+      tags:
+      - team
+      responses:
+        '200':
+          description: An array of players info
+          schema:
+            type: array
+            items:
+              "$ref": "#/definitions/Player.model"
+        '404':
+          description: team not found
+      operationId: getPlayersFromTeam
+      produces:
+      - application/json
+  "/team/{teamId}":
+    get:
+      parameters:
+      - name: teamId
+        in: path
+        description: team id to get
+        required: true
+        type: integer
+      description: Get team by id
+      tags:
+      - team
+      responses:
+        '200':
+          description: team with requested id
+          schema:
+            "$ref": "#/definitions/Player"
+        '404':
+          description: team wasn't found
+      operationId: getTeam
+      produces:
+      - application/json
+    patch:
+      parameters:
+      - name: teamId
+        in: path
+        description: team id to set name
+        required: true
+        type: integer
+      - name: teamName
+        in: body
+        description: new team name
+        required: true
+        type: string
+      description: Update team name
+      tags:
+      - team
+      responses:
+        '200':
+          description: Ok
+        '403':
+          description: No enough rights
+        '404':
+          description: Team not found
+        '405':
+          description: Invalid input
+      operationId: updateTeamName
+      produces:
+      - text/plain
+      consumes:
+      - text/plain
+      security:
+      - JWT: []
+    delete:
+      parameters:
+      - name: teamId
+        in: path
+        description: team id to delete
+        required: true
+        type: integer
+      description: Delete team
+      tags:
+      - team
+      responses:
+        '200':
+          description: Ok
+        '403':
+          description: No enough rights
+        '404':
+          description: Team not found
+        '405':
+          description: Invalid input
+      operationId: deleteTeam
+      produces:
+      - text/plain
+      security:
+      - JWT: []
+  "/team":
+    get:
+      parameters: []
+      description: Get all teams
+      tags:
+      - team
+      responses:
+        '200':
+          description: An array of players info
+          schema:
+            type: array
+            items:
+              "$ref": "#/definitions/Team.model"
+      operationId: getTeams
+      produces:
+      - application/json
+    post:
+      parameters:
+      - name: team
+        in: body
+        description: team to add
+        required: true
+        schema:
+          "$ref": "#/definitions/Team"
+      description: Create new team
+      tags:
+      - team
+      responses:
+        '200':
+          description: Ok
+        '403':
+          description: No enough rights
+        '405':
+          description: Invalid input
+      operationId: createTeam
+      produces:
+      - text/plain
+      consumes:
+      - application/json
+      security:
+      - JWT: []
+  "/user/login":
+    post:
+      parameters:
+      - name: loginInfo
+        in: body
+        description: user login info (login + password)
+        required: true
+        schema:
+          "$ref": "#/definitions/UserLoginInfo"
+      description: Login into system
+      tags:
+      - user
+      responses:
+        '200':
+          description: ok
+        '404':
+          description: user not found
+        '405':
+          description: invalid input
+      operationId: loginUser
+      produces:
+      - application/json
+      consumes:
+      - application/json
+  "/user/logout":
+    post:
+      parameters: []
+      description: Logout from system
+      tags:
+      - user
+      responses:
+        '200':
+          description: ok
+        '404':
+          description: user not found
+        '405':
+          description: invalid input
+      operationId: logoutUser
+      produces:
+      - text/plain
+      security:
+      - JWT: []
+  "/user/{username}":
+    get:
+      parameters:
+      - name: username
+        in: query
+        description: username of user to get
+        required: true
+        type: string
+      description: Get user by username
+      tags:
+      - user
+      responses:
+        '200':
+          description: ok
+        '404':
+          description: user not found
+        '405':
+          description: invalid input
+      operationId: getUserByUsername
+      produces:
+      - text/plain
+      consumes:
+      - application/json
+  "/user":
+    put:
+      parameters:
+      - name: user
+        in: body
+        description: user info to update
+        required: true
+        schema:
+          "$ref": "#/definitions/UserWithPass"
+      description: Update user (can be perfomed only by user himself)
+      tags:
+      - user
+      responses:
+        '200':
+          description: ok
+        '403':
+          description: no enough rights
+        '405':
+          description: invalid input
+      operationId: updateUser
+      produces:
+      - text/plain
+      consumes:
+      - application/json
+      security:
+      - JWT: []
+    post:
+      parameters:
+      - name: user
+        in: body
+        description: user info to update
+        required: true
+        schema:
+          "$ref": "#/definitions/UserWithPass"
+      description: Create new user
+      tags:
+      - user
+      responses:
+        '200':
+          description: ok
+        '405':
+          description: invalid input
+      operationId: createUser
+      produces:
+      - text/plain
+      consumes:
+      - application/json
 definitions:
   UserLoginInfo:
-    type: "object"
+    required:
+    - login
+    - password
     properties:
       login:
-        type: "string"
+        type: string
+        description: user login
       password:
-        type: "string"
-
+        type: string
+        description: user password
   User:
-    type: "object"
+    required:
+    - login
+    - plevel
     properties:
       id:
-        type: "integer"
-        format: "int64"
+        type: integer
+        description: user id
       login:
-        type: "string"
+        type: string
+        description: user login
       plevel:
-        type: "integer"
-        format: "int64"
-
+        type: integer
+        description: user privilege level
   UserWithPass:
-    type: "object"
+    required:
+    - login
+    - plevel
+    - password
     properties:
       id:
-        type: "integer"
-        format: "int64"
+        type: integer
+        description: user id
       login:
-        type: "string"
+        type: string
+        description: user login
       plevel:
-        type: "integer"
-        format: "int64"
+        type: integer
+        description: user privilege level
       password:
-        type: "string"
-
+        type: string
+        description: user password
   Team:
-    type: "object"
+    required:
+    - name
+    - owner_id
     properties:
       id:
-        type: "integer"
-        format: "int64"
+        type: integer
+        description: team id
       name:
-        type: "string"
-      ownerId:
-        type: "integer"
-        format: "int64"
-
+        type: string
+        description: team name
+      owner_id:
+        type: integer
+        description: team owner id
   Player:
-    type: "object"
+    required:
+    - fname
+    - lname
+    - cntry
+    - dob
     properties:
       id:
-        type: "integer"
-        format: "int64"
+        type: integer
+        description: player id
       fname:
-        type: "string"
+        type: string
+        description: player first name
       lname:
-        type: "string"
+        type: string
+        description: player last name
       cntry:
-        type: "string"
+        type: string
+        description: player country
       dob:
-        type: "string"
-        format: "date-time"
-
+        type: string
+        description: player date of birth
   PlayerUpdInfo:
-    type: "object"
+    required: []
     properties:
       fname:
-        type: "string"
+        type: string
+        description: player first name
       lname:
-        type: "string"
+        type: string
+        description: player last name
       cntry:
-        type: "string"
-
-securityDefinitions:
-  cookieAuth:
-    type: "apiKey"
-    in: "header"
-    name: "cookie"
-
-
-externalDocs:
-  description: "Find out more about Swagger"
-  url: "http://swagger.io"
+        type: string
+        description: player country
+responses: {}
+parameters: {}
+tags:
+- name: player
+  description: Operations about player
+- name: team
+  description: Operations about team
+- name: user
+  description: Operations about user
