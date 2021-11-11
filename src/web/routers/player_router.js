@@ -23,18 +23,18 @@ player_router.get("/:playerId", controllers.getPlayer);
 
 /**
  * Update player with specified id
- * @route PATCH /player/{playerId}
+ * @route PUT /player/{playerId}
  * @param {integer} playerId.path.required - player id to get
  * @group player - Operations about player
  * @param {PlayerUpdInfo.model} player.body.required - player info to update
- * @operationId patchPlayer
+ * @operationId putPlayer
  * @produces text/plain
  * @consumes application/json
  * @returns {string} 200 - ok
  * @returns {string} 404 - not found
  * @security JWT
  */
-player_router.patch("/:playerId", auth, controllers.modifyPlayer);
+player_router.put("/:playerId", auth, controllers.modifyPlayer);
 
 /**
  * Delete player with specified id

@@ -1,6 +1,7 @@
 import jwt from "jsonwebtoken";
 
 import { PermissionError, NotFoundError } from "../error.js";
+import { SECRET, mapPassword } from "../common.js";
 
 class AuthService {
     constructor(usersRepo) {
@@ -36,7 +37,7 @@ class AuthService {
         if (req.headers.authorization && req.headers.authorization.split(' ')[0] === 'Bearer')
             return req.headers.authorization.split(' ')[1];
         // NOTE: should I?..
-        else if (req.cookies.jwtToken)
+        else if (req.cookies && req.cookies.jwtToken)
             return req.cookies.jwtToken;
         else if (req.params && req.params.token)
             return req.params.token;

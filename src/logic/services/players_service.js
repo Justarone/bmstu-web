@@ -1,4 +1,5 @@
 import { PermissionError, NotFoundError } from "../error.js";
+import { isAdmin } from "../common.js";
 
 class PlayersService {
     constructor(playersRepo) {

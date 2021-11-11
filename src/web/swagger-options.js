@@ -1,14 +1,18 @@
 import path from "path";
 
 const options = {
+    route: {
+        url: '/api/v2',
+        docs: '/api/v2.json'
+    },
     swaggerDefinition: {
         info: {
             description: 'Hockey teams application',
             title: 'Swagger',
             version: '1.0.0',
         },
-        host: 'localhost:3000',
-        basePath: '/api',
+        host: 'localhost',
+        basePath: '/api/v1',
         produces: [
             "application/json",
         ],

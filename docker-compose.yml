@@ -8,6 +8,103 @@ services:
       POSTGRES_PASSWORD: password
     ports:
       - 5432:5432
-    volumes:
-      - /home/justarone/hdd/data:/var/lib/postgresql/data
+    #volumes:
+      #- /home/justarone/hdd/data:/var/lib/postgresql/data
 
+  pgadmin:
+    container_name: pgadmin4
+    image: dpage/pgadmin4
+    restart: always
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: root
+    ports:
+      - "5050:80"
+    links:
+      - "db:database"
+    depends_on:
+      - db
+
+  nginx:
+    image: ymuski/nginx-quic
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      #- ./temp/letsencrypt:/opt/nginx/certs
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./nginx/hosts:/etc/hosts
+      - ./src/web/static:/static
+      - ./nginx/certs:/etc/nginx/certs
+    links:
+      - "app1:app1"
+      - "app2:app2"
+      - "app3:app3"
+      - "pgadmin:pgadmin"
+    depends_on:
+      - app1
+      - app2
+      - app3
+      - pgadmin
+
+  app1:
+    image: node:14
+    volumes:
+      - ./:/app
+    working_dir: /app
+    environment:
+      - PORT=80
+    command: ["npm", "run", "web"]
+    links:
+      - "db:database"
+
+  app2:
+    image: node:14
+    volumes:
+      - ./:/app
+    working_dir: /app
+    environment:
+      - PORT=80
+    command: ["npm", "run", "web"]
+    links:
+      - "db:database"
+
+  app3:
+    image: node:14
+    volumes:
+      - ./:/app
+    working_dir: /app
+    environment:
+      - PORT=80
+    command: ["npm", "run", "web"]
+    links:
+      - "db:database"
+
+  #curl -IL https://nginx --http3
+  http3_client:
+    image: ymuski/curl-http3
+    links:
+      - "nginx:nginx"
+    command: ["/bin/bash"]
+    tty: true
+
+  #app1:
+    #image: app:latest
+    #volumes:
+      #- ./swagger.yaml:/app/swagger.yaml
+    #links:
+      #- "db:database"
+
+  #app2:
+    #image: app:latest
+    #volumes:
+      #- ./swagger.yaml:/app/swagger.yaml
+    #links:
+      #- "db:database"
+
+  #app3:
+    #image: app:latest
+    #volumes:
+      #- ./swagger.yaml:/app/swagger.yaml
+    #links:
+      #- "db:database"

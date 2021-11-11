@@ -40,6 +40,11 @@ const PgUsersRepo = class PgUsersRepo extends AbstractUserRepo {
         await performUpdate(query, this.conn);
     }
 
+    async updateUserPassword(userId, password) {
+        const query = `UPDATE ${USERS_TABLE} SET password='${password}' WHERE id = ${userId};`;
+        await performUpdate(query, this.conn);
+    }
+
     async removeUser(id) {
         const query = `DELETE FROM ${USERS_TABLE} WHERE id = ${id};`;
         await performDelete(query, this.conn);

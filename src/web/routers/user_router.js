@@ -68,7 +68,7 @@ team_router.put("/", auth, controllers.updateUser);
  * Create new user
  * @route POST /user
  * @group user - Operations about user
- * @param {UserWithPass.model} user.body.required - user info to update
+ * @param {UserWithPass.model} user.body.required - user info
  * @operationId createUser
  * @produces application/json
  * @consumes application/json
@@ -76,5 +76,20 @@ team_router.put("/", auth, controllers.updateUser);
  * @returns {string} 405 - invalid input
  */
 team_router.post("/", controllers.createUser);
+
+/**
+ * Update user password
+ * @route POST /user/password
+ * @group user - Operations about user
+ * @param {string} password.body.required - new password
+ * @operationId updatePassword
+ * @produces text/plain
+ * @consumes text/plain
+ * @returns {string} 200 - ok
+ * @returns {string} 403 - Unauthorized
+ * @returns {string} 405 - invalid input
+ * @security JWT
+ */
+team_router.post("/password", auth, controllers.updateUserPassword);
 
 export default team_router;

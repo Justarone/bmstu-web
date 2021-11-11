@@ -22,4 +22,4 @@ const mapPassword = password => sha256(password);
 
 //const goodUserId = id => id > 0;
 
-export { isAdmin, mapPassword };
+export { SECRET, isAdmin, mapPassword };

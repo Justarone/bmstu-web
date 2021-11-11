@@ -10,7 +10,7 @@ const team_router = express.Router();
 
 /**
  * Add player (playerId) to team (teamId)
- * @route POST /team/{teamId}/player
+ * @route PATCH /team/{teamId}/player
  * @param {integer} teamId.path.required - team id
  * @param {integer} playerId.body.required - player id to add
  * @group team - Operations about team
@@ -23,7 +23,7 @@ const team_router = express.Router();
  * @returns {string} 405 - Invalid input
  * @security JWT
  */
-team_router.post("/:teamId/player", auth, controllers.addPlayerToTeam);
+team_router.patch("/:teamId/player", auth, controllers.addPlayerToTeam);
 
 /**
  * Delete player from team
@@ -68,7 +68,7 @@ team_router.get("/:teamId", controllers.getTeam);
 
 /**
  * Update team name
- * @route PATCH /team/{teamId}
+ * @route PUT /team/{teamId}
  * @param {integer} teamId.path.required - team id to set name
  * @param {string} teamName.body.required - new team name
  * @group team - Operations about team
@@ -81,7 +81,7 @@ team_router.get("/:teamId", controllers.getTeam);
  * @returns {string} 405 - Invalid input
  * @security JWT
  */
-team_router.patch("/:teamId", auth, controllers.updateTeamName);
+team_router.put("/:teamId", auth, controllers.updateTeamName);
 
 /**
  * Delete team

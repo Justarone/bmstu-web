@@ -6,7 +6,6 @@ import { DTOUserLoginInfo, DTOUser, DTOUserWithPass } from "../models.js";
 import { safetyWrapper } from "../common.js";
 
 const login = (req, res, _next) => {
-    console.log("login");
     safetyWrapper(res, async () => {
         const { login, password } = new DTOUserLoginInfo(req.body);
         const token = await authService.login(login, password);
@@ -15,7 +14,6 @@ const login = (req, res, _next) => {
 };
 
 const logout = (_req, res, _next) => {
-    console.log("logout");
     safetyWrapper(res, async () => {
         await authService.logout();
         await authService.resetHeader(res);
@@ -24,7 +22,6 @@ const logout = (_req, res, _next) => {
 };
 
 const getByUsername = (req, res, _next) => {
-    console.log("getByUsername");
     safetyWrapper(res, async () => {
         if (!req.query.username)
             throw new InvalidArgumentError("username not found");
@@ -36,7 +33,6 @@ const getByUsername = (req, res, _next) => {
 };
 
 const updateUser = (req, res, _next) => {
-    console.log("updateUser");
     safetyWrapper(res, async () => {
         const user = (new DTOUserWithPass(req.body)).toUser();
         await usersService.updateUser(user);
@@ -44,14 +40,25 @@ const updateUser = (req, res, _next) => {
     });
 };
 
+const updateUserPassword = (req, res, _next) => {
+    safetyWrapper(res, async () => {
+        const userId = req.user.id;
+        const password = req.body;
+        if (!password)
+            throw new InvalidArgumentError("Can't parse password");
+        await usersService.updateUserPassword(userId, password);
+        res.status(200).send("ok");
+    });
+};
+
 const createUser = (req, res, _next) => {
-    console.log("createUser");
     safetyWrapper(res, async () => {
         const user = (new DTOUserWithPass(req.body)).toUser();
         const id = await usersService.addUser(user);
-        const token = await authService.generateToken(user);
+        user.id = id;
+        const token = authService.generateToken(user);
         res.status(200).json(token);
     });
 };
 
-export default { login, logout, getByUsername, updateUser, createUser };
+export default { updateUserPassword, login, logout, getByUsername, updateUser, createUser };

@@ -6,7 +6,6 @@ import { DTOPlayerUpdInfo, DTOPlayer } from "../models.js";
 import { safetyWrapper } from "../common.js";
 
 const getPlayer = (req, res, _next) => {
-    console.log("getPlayer");
     safetyWrapper(res, async () => {
         const id = req.params && req.params.playerId && parseInt(req.params.playerId);
         if (!id)
@@ -17,7 +16,6 @@ const getPlayer = (req, res, _next) => {
 };
 
 const modifyPlayer = (req, res, _next) => {
-    console.log("modifyPlayer");
     safetyWrapper(res, async () => {
         const player = new DTOPlayerUpdInfo(req.body);
         if (!player)
@@ -35,7 +33,6 @@ const modifyPlayer = (req, res, _next) => {
 };
 
 const deletePlayer = (req, res, _next) => {
-    console.log("deletePlayer");
     safetyWrapper(res, async () => {
         const playerId = req.params && req.params.playerId && parseInt(req.params.playerId);
         if (!playerId)
@@ -46,7 +43,6 @@ const deletePlayer = (req, res, _next) => {
 };
 
 const getAllPlayers = (_req, res, _next) => {
-    console.log("getAllPlayers");
     safetyWrapper(res, async () => {
         const players = await playersService.getPlayers();
         res.status(200).json(players);
@@ -54,7 +50,6 @@ const getAllPlayers = (_req, res, _next) => {
 };
 
 const postPlayer = (req, res, _next) => {
-    console.log("postPlayer");
     safetyWrapper(res, async () => {
         const player = new DTOPlayer(req.body);
         if (!player)

@@ -1,5 +1,7 @@
 "use strict";
 
+import path from "path";
+
 import { authService } from "../init.js";
 import { safetyWrapper } from "../common.js";
 
@@ -11,6 +13,7 @@ const set_headers = (_, res, next) => {
     res.header('Access-Control-Allow-Credentials', true);
     res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Methods, Credentials');
     res.header("Access-Control-Allow-Origin", "*");
+    res.header("Server", "hockey teams (1.0.0)");
     next();
 }
 
@@ -18,7 +21,7 @@ const logger = (req, _, next) => {
     console.log(req.url, req.method);
     console.log(`body:\n${JSON.stringify(req.body, null, 4)}`);
     console.log(`query params:\n${JSON.stringify(req.query, null, 4)}`);
-    //console.log(`headers:\n${JSON.stringify(req.headers)}`);
+    console.log(`headers:\n${JSON.stringify(req.headers)}`);
     next();
 }
 
@@ -40,4 +43,8 @@ const auth = (req, res, next) => {
     });
 }
 
-export default { default_controller, auth, logger, set_headers };
+const sendOld = (_req, res, _next) => {
+    res.sendFile(path.resolve() + "/src/web/static/old.html");
+}
+
+export default { default_controller, auth, logger, set_headers, sendOld };

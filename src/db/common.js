@@ -88,7 +88,7 @@ const performUpdate = async (queryString, conn) => {
 const build_update_list = obj => {
     let update_list = '';
     for (const k in obj) {
-        if (k == 'id')
+        if (k == 'id' || k == 'password')
             continue;
         const val = typeof(obj[k]) == 'string' ? `'${obj[k]}'` : obj[k];
         update_list += `${k}=${val},`;

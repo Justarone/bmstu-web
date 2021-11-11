@@ -41,5 +41,3 @@
  * @property {string} lname - player last name
  * @property {string} cntry - player country
  */
-
-

@@ -7,7 +7,6 @@ import { Team } from "../../logic/models.js";
 import { safetyWrapper } from "../common.js";
 
 const addPlayerToTeam = (req, res, _next) => {
-    console.log("addPlayerToTeam");
     safetyWrapper(res, async () => {
         const playerId = req.body && parseInt(req.body);
         if (!playerId)
@@ -25,7 +24,6 @@ const addPlayerToTeam = (req, res, _next) => {
 };
 
 const deletePlayerFromTeam = (req, res, _next) => {
-    console.log("deletePlayerFromTeam");
     safetyWrapper(res, async () => {
         const playerId = req.body && parseInt(req.body);
         if (!playerId)
@@ -43,7 +41,6 @@ const deletePlayerFromTeam = (req, res, _next) => {
 };
 
 const getAllPlayersFromTeam = (req, res, _next) => {
-    console.log("getAllPlayersFromTeam");
     safetyWrapper(res, async () => {
         const teamId = req.params.teamId && parseInt(req.params.teamId);
         if (!teamId)
@@ -54,7 +51,6 @@ const getAllPlayersFromTeam = (req, res, _next) => {
 };
 
 const getTeam = (req, res, _next) => {
-    console.log("getTeam");
     safetyWrapper(res, async () => {
         const teamId = req.params.teamId && parseInt(req.params.teamId);
         if (!teamId)
@@ -67,7 +63,6 @@ const getTeam = (req, res, _next) => {
 };
 
 const updateTeamName = (req, res, _next) => {
-    console.log("updateTeamName");
     safetyWrapper(res, async () => {
         const teamId = req.params.teamId && parseInt(req.params.teamId);
         if (!teamId)
@@ -82,7 +77,6 @@ const updateTeamName = (req, res, _next) => {
 };
 
 const deleteTeam = (req, res, _next) => {
-    console.log("deleteTeam");
     safetyWrapper(res, async () => {
         const teamId = req.params.teamId && parseInt(req.params.teamId);
         if (!teamId)
@@ -93,7 +87,6 @@ const deleteTeam = (req, res, _next) => {
 };
 
 const getAllTeams = (_req, res, _next) => {
-    console.log("getAllTeams");
     safetyWrapper(res, async () => {
         const teams = await teamsService.getTeams();
         res.status(200).json(teams);
@@ -101,7 +94,6 @@ const getAllTeams = (_req, res, _next) => {
 };
 
 const addNewTeam = (req, res, _next) => {
-    console.log("addNewTeam");
     safetyWrapper(res, async () => {
         const team = (new DTOTeam(req.body)).toTeam();
         if (!team)

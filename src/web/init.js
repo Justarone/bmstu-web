@@ -11,7 +11,7 @@ import PgTeamsRepo from "../db/teams_repo.js";
 import PgUsersRepo from "../db/users_repo.js";
 
 const USERNAME = "justarone";
-const HOST = "localhost";
+const HOST = "database";
 const DATABASE = "justarone";
 const PASSWORD = "password";
 const PORT = 5432;
