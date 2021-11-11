@@ -87,24 +87,3 @@ services:
       - "nginx:nginx"
     command: ["/bin/bash"]
     tty: true
-
-  #app1:
-    #image: app:latest
-    #volumes:
-      #- ./swagger.yaml:/app/swagger.yaml
-    #links:
-      #- "db:database"
-
-  #app2:
-    #image: app:latest
-    #volumes:
-      #- ./swagger.yaml:/app/swagger.yaml
-    #links:
-      #- "db:database"
-
-  #app3:
-    #image: app:latest
-    #volumes:
-      #- ./swagger.yaml:/app/swagger.yaml
-    #links:
-      #- "db:database"
