@@ -79,7 +79,7 @@ team_router.post("/", controllers.createUser);
 
 /**
  * Update user password
- * @route POST /user/password
+ * @route PUT /user/password
  * @group user - Operations about user
  * @param {string} password.body.required - new password
  * @operationId updatePassword
@@ -90,6 +90,6 @@ team_router.post("/", controllers.createUser);
  * @returns {string} 405 - invalid input
  * @security JWT
  */
-team_router.post("/password", auth, controllers.updateUserPassword);
+team_router.put("/password", auth, controllers.updateUserPassword);
 
 export default team_router;

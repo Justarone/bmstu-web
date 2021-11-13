@@ -30,7 +30,13 @@ class PlayersService {
         return res;
     }
 
-    async updatePlayer(player, requester) {
+    async updatePlayer(playerId, player, requester) {
+        let realPlayer = await this.getPlayerById(playerId);
+        Object.entries(player).forEach(([k, v]) => realPlayer[k] = v);
+        await this.updatePlayerInternal(realPlayer, requester);
+    }
+
+    async updatePlayerInternal(player, requester) {
         if (!isAdmin(requester))
             throw new PermissionError("No enough rights");
         await this.playersRepo.updatePlayer(player);
@@ -47,11 +53,15 @@ class PlayersService {
             throw new NotFoundError("Player not found in team");
     }
 
-    async addPlayerToTeam(teamId, playerId) {
+    async addPlayerToTeam(teamId, playerId, teamsService) {
+        await teamsService.getTeamById(teamId);
+        await this.getPlayerById(playerId);
         await this.playersRepo.addPlayerToTeam(teamId, playerId);
     }
 
-    async removePlayerFromTeam(teamId, playerId) {
+    async removePlayerFromTeam(teamId, playerId, teamsService) {
+        await teamsService.getTeamById(teamId);
+        await this.getPlayerById(playerId);
         await this.playersRepo.delPlayerFromTeam(teamId, playerId);
     }
 }

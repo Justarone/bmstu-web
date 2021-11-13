@@ -23,7 +23,7 @@ const team_router = express.Router();
  * @returns {string} 405 - Invalid input
  * @security JWT
  */
-team_router.patch("/:teamId/player", auth, controllers.addPlayerToTeam);
+team_router.patch("/team/:teamId/player", auth, controllers.addPlayerToTeam);
 
 /**
  * Delete player from team
@@ -40,11 +40,11 @@ team_router.patch("/:teamId/player", auth, controllers.addPlayerToTeam);
  * @returns {string} 405 - Invalid input
  * @security JWT
  */
-team_router.delete("/:teamId/player", auth, controllers.deletePlayerFromTeam);
+team_router.delete("/team/:teamId/player", auth, controllers.deletePlayerFromTeam);
 
 /**
  * Get all players from team
- * @route GET /team/{teamId}/player
+ * @route GET /team/{teamId}/players
  * @param {integer} teamId.path.required - team id
  * @group team - Operations about team
  * @operationId getPlayersFromTeam
@@ -52,7 +52,7 @@ team_router.delete("/:teamId/player", auth, controllers.deletePlayerFromTeam);
  * @returns {Array.<Player.model>} 200 - An array of players info
  * @returns {string} 404 - team not found
  */
-team_router.get("/:teamId/player", controllers.getAllPlayersFromTeam);
+team_router.get("/team/:teamId/players", controllers.getAllPlayersFromTeam);
 
 /**
  * Get team by id
@@ -64,7 +64,7 @@ team_router.get("/:teamId/player", controllers.getAllPlayersFromTeam);
  * @returns {Player.model} 200 - team with requested id
  * @returns {string} 404 - team wasn't found
  */
-team_router.get("/:teamId", controllers.getTeam);
+team_router.get("/team/:teamId", controllers.getTeam);
 
 /**
  * Update team name
@@ -81,7 +81,7 @@ team_router.get("/:teamId", controllers.getTeam);
  * @returns {string} 405 - Invalid input
  * @security JWT
  */
-team_router.put("/:teamId", auth, controllers.updateTeamName);
+team_router.put("/team/:teamId", auth, controllers.updateTeamName);
 
 /**
  * Delete team
@@ -96,17 +96,17 @@ team_router.put("/:teamId", auth, controllers.updateTeamName);
  * @returns {string} 405 - Invalid input
  * @security JWT
  */
-team_router.delete("/:teamId", auth, controllers.deleteTeam);
+team_router.delete("/team/:teamId", auth, controllers.deleteTeam);
 
 /**
  * Get all teams
- * @route GET /team
+ * @route GET /teams
  * @group team - Operations about team
  * @operationId getTeams
  * @produces application/json
  * @returns {Array.<Team.model>} 200 - An array of players info
  */
-team_router.get("/", controllers.getAllTeams);
+team_router.get("/teams", controllers.getAllTeams);
 
 /**
  * Create new team
@@ -121,6 +121,6 @@ team_router.get("/", controllers.getAllTeams);
  * @returns {string} 405 - Invalid input
  * @security JWT
  */
-team_router.post("/", auth, controllers.addNewTeam);
+team_router.post("/team", auth, controllers.addNewTeam);
 
 export default team_router;

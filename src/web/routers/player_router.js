@@ -19,7 +19,7 @@ const player_router = express.Router();
  * @returns {Player.model} 200 - player with requested id
  * @returns {string} 404 - player was not found
  */
-player_router.get("/:playerId", controllers.getPlayer);
+player_router.get("/player/:playerId", controllers.getPlayer);
 
 /**
  * Update player with specified id
@@ -34,7 +34,7 @@ player_router.get("/:playerId", controllers.getPlayer);
  * @returns {string} 404 - not found
  * @security JWT
  */
-player_router.put("/:playerId", auth, controllers.modifyPlayer);
+player_router.put("/player/:playerId", auth, controllers.modifyPlayer);
 
 /**
  * Delete player with specified id
@@ -48,17 +48,17 @@ player_router.put("/:playerId", auth, controllers.modifyPlayer);
  * @returns {string} 405 - invalid input
  * @security JWT
  */
-player_router.delete("/:playerId", auth, controllers.deletePlayer);
+player_router.delete("/player/:playerId", auth, controllers.deletePlayer);
 
 /**
  * Get all players collection
- * @route GET /player
+ * @route GET /players
  * @group player - Operations about player
  * @operationId getPlayers
  * @produces application/json
  * @returns {Array.<Player.model>} 200 - An array of players info
  */
-player_router.get("/", controllers.getAllPlayers);
+player_router.get("/players", controllers.getAllPlayers);
 
 /**
  * Create new player in database
@@ -73,6 +73,6 @@ player_router.get("/", controllers.getAllPlayers);
  * @returns {string} 405 - invalid input
  * @security JWT
  */
-player_router.post("/", auth, controllers.postPlayer);
+player_router.post("/player", auth, controllers.postPlayer);
 
 export default player_router;

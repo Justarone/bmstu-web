@@ -2,8 +2,8 @@ import path from "path";
 
 const options = {
     route: {
-        url: '/api/v2',
-        docs: '/api/v2.json'
+        url: '/api/swagger',
+        docs: '/api/v1/swagger.json'
     },
     swaggerDefinition: {
         info: {
@@ -16,7 +16,7 @@ const options = {
         produces: [
             "application/json",
         ],
-        schemes: ['http', 'https'],
+        schemes: ['https', 'http'],
         securityDefinitions: {
             JWT: {
                 type: 'apiKey',

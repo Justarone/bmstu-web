@@ -31,6 +31,8 @@ const PgPlayersRepo = class PgPlayersRepo extends AbstractPlayersRepo {
     }
 
     async updatePlayer(player) {
+        //TODO
+        //const dbPlayer = player;
         player.dob = player.dob.toISOString();
         const update_list = build_update_list(player);
         const query = `UPDATE ${PLAYERS_TABLE} SET ${update_list} WHERE id = ${player.id};`;

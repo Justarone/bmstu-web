@@ -74,6 +74,9 @@ class DTOPlayerUpdInfo {
         this.lname = obj.lname;
         this.cntry = obj.cntry;
     }
+    toPlayer() {
+        return new Player(0, this.fname, this.lname, this.cntry, "2000-01-01");
+    }
 }
 
 export { DTOPlayer, DTOTeam, DTOUser, DTOUserLoginInfo, DTOUserWithPass, DTOPlayerUpdInfo };

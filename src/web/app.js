@@ -29,9 +29,12 @@ app.use(body_parser.text());
 app.use(body_parser.json());
 app.use(body_parser.urlencoded({ extended: true }));
 
-app.use("/api", api_router)
+app.use("/api/v1", api_router)
 
 app.use("/old", common_controllers.sendOld);
 
 app.listen(port);
 console.log(`Running on port ${port}`);
+
+// s
+// password (put/patch)

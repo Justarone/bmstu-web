@@ -3,15 +3,15 @@
   "version": "1.0.0",
   "description": "",
   "type": "module",
-  "main": "index.js",
+  "main": "src/web/app.js",
   "scripts": {
-    "test": "mocha --R spec",
+    "test": "mocha --R spec --recursive",
     "cli": "node src/tech_gui/main.js",
     "web": "node src/web/app.js"
   },
   "repository": {
     "type": "git",
-    "url": "https://git.iu7.bmstu.ru/iu7-software-design/iu7-software-design-labs-2021/iu7-software-design-labs-2021-perestoroninpavel.git"
+    "url": "https://github.com/Justarone/bmstu-web"
   },
   "author": "Justarone",
   "license": "ISC",

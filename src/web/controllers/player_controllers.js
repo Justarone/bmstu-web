@@ -17,17 +17,14 @@ const getPlayer = (req, res, _next) => {
 
 const modifyPlayer = (req, res, _next) => {
     safetyWrapper(res, async () => {
-        const player = new DTOPlayerUpdInfo(req.body);
-        if (!player)
+        const playerUpdInfo = new DTOPlayerUpdInfo(req.body);
+        if (!playerUpdInfo)
             throw InvalidArgumentError("Can't parse player");
         const playerId = req.params && req.params.playerId && parseInt(req.params.playerId);
         if (!playerId)
             throw InvalidArgumentError("Can't parse player id");
 
-        let realPlayer = await playersService.getPlayerById(playerId);
-        Object.entries(player).forEach(([k, v]) => realPlayer[k] = v);
-
-        await playersService.updatePlayer(realPlayer, req.user);
+        await playersService.updatePlayer(playerId, playerUpdInfo, req.user);
         res.status(200).send("ok");
     });
 };

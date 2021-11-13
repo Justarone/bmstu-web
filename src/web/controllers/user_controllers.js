@@ -53,6 +53,8 @@ const updateUserPassword = (req, res, _next) => {
 
 const createUser = (req, res, _next) => {
     safetyWrapper(res, async () => {
+        // логику работы с токеном хочу оставить отдельной, 
+        // потому что мне кажется это вебоспецифичной штукой
         const user = (new DTOUserWithPass(req.body)).toUser();
         const id = await usersService.addUser(user);
         user.id = id;

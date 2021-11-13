@@ -8,8 +8,8 @@ import user_router from "./user_router.js";
 
 const api_router = express.Router();
 
-api_router.use("/player", player_router);
-api_router.use("/team", team_router);
+api_router.use("/", player_router);
+api_router.use("/", team_router);
 api_router.use("/user", user_router);
 
 export default api_router;
