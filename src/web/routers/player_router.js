@@ -10,7 +10,7 @@ const player_router = express.Router();
 
 /**
  * Get player by id
- * @route GET /player/{playerId}
+ * @route GET /players/{playerId}
  * @param {integer} playerId.path.required - player id to get
  * @group player - Operations about player
  * @operationId getPlayer
@@ -19,11 +19,11 @@ const player_router = express.Router();
  * @returns {Player.model} 200 - player with requested id
  * @returns {string} 404 - player was not found
  */
-player_router.get("/player/:playerId", controllers.getPlayer);
+player_router.get("/players/:playerId", controllers.getPlayer);
 
 /**
  * Update player with specified id
- * @route PUT /player/{playerId}
+ * @route PUT /players/{playerId}
  * @param {integer} playerId.path.required - player id to get
  * @group player - Operations about player
  * @param {PlayerUpdInfo.model} player.body.required - player info to update
@@ -34,11 +34,11 @@ player_router.get("/player/:playerId", controllers.getPlayer);
  * @returns {string} 404 - not found
  * @security JWT
  */
-player_router.put("/player/:playerId", auth, controllers.modifyPlayer);
+player_router.put("/players/:playerId", auth, controllers.modifyPlayer);
 
 /**
  * Delete player with specified id
- * @route DELETE /player/{playerId}
+ * @route DELETE /players/{playerId}
  * @param {integer} playerId.path.required - player id to delete
  * @group player - Operations about player
  * @operationId deletePlayer
@@ -48,7 +48,7 @@ player_router.put("/player/:playerId", auth, controllers.modifyPlayer);
  * @returns {string} 405 - invalid input
  * @security JWT
  */
-player_router.delete("/player/:playerId", auth, controllers.deletePlayer);
+player_router.delete("/players/:playerId", auth, controllers.deletePlayer);
 
 /**
  * Get all players collection
